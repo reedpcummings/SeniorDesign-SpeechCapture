@@ -39,5 +39,9 @@ def index(request):
 
     #json_file.close()
 
-    return render(request, 'transcribe/index.html', {'data': test, 'test1':test1})
+    test2_file = open(os.path.join(os.path.curdir, 'transcribe', 'test.txt'), 'r')
+    test2 = test2_file.read()
+    test2_file.close()
+
+    return render(request, 'transcribe/index.html', {'data': test, 'test1':test1, 'test2': test2})
     #HttpResponse("<h1>This is a test <button>Click Me!</button>")
