@@ -1,8 +1,7 @@
-{% load static %}
 <!DOCTYPE html>
 <html>
 <style>
-html, body { height: 100%; width: 100%; margin: 0; }
+  html, body { height: 100%; width: 100%; margin: 0; }
 div { height: 100%; width: 100%; }
 
   .anyClass {
@@ -114,91 +113,42 @@ div { height: 100%; width: 100%; }
       <div style="display:none;" class="myDiv animate-bottom center">
         <pre style="text-align: left" class="anyClass">
 {{test1}}
+
 {{test2}}
         </pre>
       </div>
-
-      <!-- <div id="accordion" class="d-none">
-        <div class="card">
-          <div class="card-header">
-            <a class="card-link" data-toggle="collapse" href="#collapseOne">
-              Static Image Example
-            </a>
-          </div>
-          <div id="collapseOne" class="collapse show" data-parent="#accordion">
-            <div class="card-body">
-              <img src="{% static 'img//profile-pic1.png' %}">
-              <h2>It's working!</h2>
-              {{data}}
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header">
-            <a class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">
-              09_14_Test10 Result
-            </a>
-          </div>
-          <div id="collapseTwo" class="collapse" data-parent="#accordion">
-            <div class="card-body">
-              {{test1}}
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header">
-            <a class="collapsed card-link" data-toggle="collapse" href="#collapseThree">
-              09_14_Test09 Result
-            </a>
-          </div>
-          <div id="collapseThree" class="collapse" data-parent="#accordion">
-            <div class="card-body">
-              {{test2}}
-            </div>
-          </div>
-        </div>
-      </div>
-       -->
     </div>
   </div>
 
   <div class="footer">
-      <div class="row">
-        <div class="col-sm-4 text-center">
-          <button type="button" class="btn btn-default btn-lg">Back</button>
-        </div>
-        <div style="display:none;" class="myDiv animate-bottom col-sm-4 text-center">
-          <button type="button" class="btn btn-default btn-lg">Download</button>
-        </div>
-        <div style="display:none;" class="myDiv animate-bottom col-sm-4 text-center">
-          <button type="button" class="btn btn-default btn-lg">Analyze</button>
-        </div>
+    <div class="row">
+      <div class="col-sm-4 text-center">
+        <button type="button" class="btn btn-default btn-lg">Back</button>
+      </div>
+      <div style="display:none;" class="myDiv animate-bottom col-sm-4 text-center">
+        <button type="button" class="btn btn-default btn-lg">Download</button>
+      </div>
+      <div style="display:none;" class="myDiv animate-bottom col-sm-4 text-center">
+        <button type="button" class="btn btn-default btn-lg">Analyze</button>
       </div>
     </div>
+  </div>
 
   <script>
-      var myVar;
-    
+    var myVar;
+
     function myFunction() {
-        myVar = setTimeout(showPage, 3000);
+      myVar = setTimeout(showPage, 5000);
     }
-    
+
     function showPage() {
       document.getElementById("loader").style.display = "none";
       var good = document.getElementsByClassName("myDiv");
 
       for (var i = 0; i < good.length; i++) {
-         good[i].style.display = 'block';
-}
-
-      document.getElementById("myBut").style.display = "block";
-      document.getElementById("myTest").style.display = "block";
+        good[i].style.display = 'block';
+      }
     }
-      </script>
-
-
+  </script>
 </body>
-
-
-
 </html>

@@ -31,7 +31,7 @@ key.close()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['speechcapture-env.kphfmxdver.us-west-2.elasticbeanstalk.com', "127.0.0.1"]
+ALLOWED_HOSTS = ['localhost','speechcapture-env.kphfmxdver.us-west-2.elasticbeanstalk.com', "127.0.0.1"]
 
 key_aws = open(os.path.join(os.path.curdir, 'transcribe', 'keys.txt'), 'r')
 key_aws = key_aws.read()
