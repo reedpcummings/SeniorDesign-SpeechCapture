@@ -4,7 +4,7 @@ function upload(blob) {
     form.append('audio_test', blob);
 
     $.ajax({
-        url: 'http://localhost:8000/transcribe/record/',
+        url: 'http://localhost:8000/transcribe/record2/',
         type: 'POST',
         data: form,
         processData: false,

@@ -3,6 +3,7 @@ from django.http import HttpResponse
 import boto3
 import json
 import os
+import time
 
 ###########################################################################################################
 from django.views.decorators.csrf import csrf_exempt
@@ -34,14 +35,23 @@ def index(request, fileName):
 
     job_uri = "https://s3-us-west-2-amazonaws.com/test-speechcapture/" + fileName
     s3_client2.start_transcription_job(
-        TranscriptionJobName='Test60',
+        TranscriptionJobName='Test76',
         Media={'MediaFileUri': job_uri},
         MediaFormat='wav',
         LanguageCode='en-US',
         OutputBucketName='test-speechcapture'
     )
+
+    while True:
+        status = s3_client2.get_transcription_job(TranscriptionJobName="Test76")
+        if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:
+            break
+        print("Not ready yet...")
+        time.sleep(5)
+
+
     test = "Test"
-    result = s3_client.get_object(Bucket='test-speechcapture', Key='09_14_Test10.json')
+    result = s3_client.get_object(Bucket='test-speechcapture', Key='Test76.json')
  
     # Read the object (not compressed):
     text = result["Body"].read().decode()
@@ -74,8 +84,6 @@ def record(request):
             file.write(audio_file)
             file.close()
 
-            return index(request)
-
     else:
         message = "Not Ajax"
         print(message)
@@ -89,3 +97,21 @@ def fileHandle(request):
         print("Success!")
     else:
         print("Fail")
+
+@csrf_exempt
+def record2(request):
+    if request.is_ajax():
+        message = "Yes, AJAX!"
+        print(message)
+
+        if request.method == "POST":
+            audio_file = request.FILES['audio_test'].read()
+            file = open('test_audio.wav', 'wb')
+            file.write(audio_file)
+            file.close()
+
+    else:
+        message = "Not Ajax"
+        print(message)
+
+    return render(request, 'transcribe/record2.html', {})
