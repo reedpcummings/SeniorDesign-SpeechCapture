@@ -1,0 +1,35 @@
+{% extends "webapp/header.html" %}
+
+{% block transcript %}
+
+	<div class = "container topElement">
+		<div class="row">
+			<div class="col text-center">
+				<button type="button" class="btn btn-secondary">Upload Audio File</button>
+			</div>
+			<div class="col text-center">
+				<a href="" id="saveButton"><button type="button" class="btn btn-secondary">Save Text</button></a>
+			</div>
+			<div class="col text-center">
+				<button type="button" class="btn btn-secondary">Go to Analysis</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="container scroll">
+		<div class="card">
+			<div class="card-body">
+				<div style="border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">
+					<p id="scriptText">
+						{% for key,value in data.items %}
+							<script type="text/javascript"> 
+							   var text = "{{value}}";
+							</script>
+							{{value}}
+						{% endfor %}
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

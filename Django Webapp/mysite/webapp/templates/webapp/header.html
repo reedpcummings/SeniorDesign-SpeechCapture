@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Python Project</title>
+	<meta charset="utf-8" />
+	{% load staticfiles %}
+
+	<link rel="stylesheet" href="{% static 'webapp/css/bootstrap.min.css' %}" type = "text/css"/>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="{% static 'webapp/scripts/style.css' %}"/>
+	
+	<script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+	
+	
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">Meeting Transciption & Analysis</a>
+        <button href="{% url 'index' %}" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'index' %}">Home
+                <span class="sr-only">(current)</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Contact</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+	
+	{% block home %}
+	{% endblock %}
+	{% block transcript %}
+	{% endblock %}
+	{% block analysis %}
+	{% endblock %}
+	{% block record %}
+	{% endblock %}
+	{% block history %}
+	{% endblock %}
+
+    <!-- Footer -->
+	<div class="fixed-bottom">
+		<footer class="py-2 bg-dark">
+		  <div class="container">
+			<p class="m-0 text-center text-white">Copyright &copy; Your Website 2018</p>
+		  </div>
+		  <!-- /.container -->
+		</footer>
+	</div>
+	
+	<script type="text/javascript" src="{% static 'webapp/scripts/downloadFile.js' %}"></script>
+	<script type="text/javascript" src="{% static 'webapp/scripts/recorderButtons.js' %}"></script>
+	<script type="text/javascript" src="{% static 'webapp/scripts/recorderServerUpload.js' %}"></script>
+	
+</body>
+
+</html>
