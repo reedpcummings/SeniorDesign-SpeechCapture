@@ -1,0 +1,12 @@
+
+.DS_Store
+s_a/.DS_Store
+s_a/homepage/.DS_Store
+s_a/homepage/__pycache__/urls.cpython-36.pyc
+s_a/homepage/templates/homepage/record-live-audio.js
+s_a/homepage/__pycache__/views.cpython-36.pyc
+s_a/homepage/urls.py
+s_a/homepage/views.py
+s_a/s_a/.DS_Store
+s_a/s_a/settings.py
+s_a/s_a/__pycache__/settings.cpython-36.pyc

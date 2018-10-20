@@ -1,0 +1,28 @@
+body {
+  padding-top: 54px;
+}
+
+html,body{
+	height: 100%
+}
+
+.scroll {
+	padding-top: 35px;
+	padding-bottom: 35px;
+    max-height: 80vh;
+    overflow-y: scroll;
+}
+
+@media (min-width: 992px) {
+  body {
+    padding-top: 56px;
+  }
+}
+
+.topElement {
+  padding: 20px;
+}
+
+.card {
+  height: 100%;
+}
