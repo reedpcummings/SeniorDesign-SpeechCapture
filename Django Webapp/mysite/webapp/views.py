@@ -7,11 +7,13 @@ from .models import Recordings, Transcriptions, Analysis
 from .forms import UserForm
 
 from django.http import HttpResponse
-from .libs import Comprehend
-from .libs import Transcribe
+#from .libs import Comprehend
+#from .libs import Transcribe
 
 def index(request):
-    return render(request, 'webapp/home.html')
+    directory_old = os.listdir(os.path.join(os.getcwd(), "webapp", "static"))
+    directory_new = os.listdir(os.path.join(os.getcwd(), "webapp", "static", "webapp"))
+    return render(request, 'webapp/home.html', {'directory': directory_new, 'directory2': directory_old})
 
 def transcript(request):
     # key_file = open(os.path.join(os.path.curdir, 'transcribe', 'keys.txt'), 'r')

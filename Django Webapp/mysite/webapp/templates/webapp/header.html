@@ -11,12 +11,15 @@
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<link rel="stylesheet" href="{% static 'webapp/scripts/style.css' %}"/>
+
+
 	
 	<script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
 	
 	
 </head>
-
+{{directory}}
+{{directory2}}
 
 <body>
 
@@ -46,8 +49,8 @@
           </ul>
         </div>
       </div>
-    </nav>
-	
+		</nav>
+
 	{% block home %}
 	{% endblock %}
 	{% block transcript %}
@@ -69,10 +72,10 @@
 		</footer>
 	</div>
 	
+	
 	<script type="text/javascript" src="{% static 'webapp/scripts/downloadFile.js' %}"></script>
 	<script type="text/javascript" src="{% static 'webapp/scripts/recorderButtons.js' %}"></script>
 	<script type="text/javascript" src="{% static 'webapp/scripts/recorderServerUpload.js' %}"></script>
-	
 </body>
 
 </html>

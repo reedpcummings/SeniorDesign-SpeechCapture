@@ -25,13 +25,12 @@ SECRET_KEY = '((95k_0ep%a278$#@7=(_%xe4$4@8)4wc=40yb+4op2qa+(jo1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1','speechcaptureapp-env.itx2kaduqp.us-west-2.elasticbeanstalk.com']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'jquery',
     'webapp',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -119,6 +118,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
+STATIC_ROOT = os.path.join(os.getcwd(), "webapp", "static")
 STATIC_URL = '/static/'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
