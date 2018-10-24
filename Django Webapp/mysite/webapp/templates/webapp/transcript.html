@@ -2,6 +2,8 @@
 
 {% block transcript %}
 
+{% load static %}
+
 	<div class = "container topElement">
 		<div class="row">
 			<div class="col text-center">
@@ -21,15 +23,45 @@
 			<div class="card-body">
 				<div style="border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">
 					<p id="scriptText">
-						{% for key,value in data.items %}
+						<div class="ajaxProgress">
+							<h3>Please Wait...</h3>
+							<img src= "{% static 'webapp/img/ajax-loader.gif' %}"/>
+						</div>
+						{{value}}
+						<!-- {{data}} -->
+
+						<!-- {% for key,value in data.items %}
 							<script type="text/javascript"> 
 							   var text = "{{value}}";
 							</script>
 							{{value}}
-						{% endfor %}
+						{% endfor %} -->
 					</p>
 				</div>
 			</div>
 		</div>
 	</div>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('.ajaxProgress').show();
+			
+			$.ajax({
+				type: "GET",
+				url: "http://127.0.0.1:8000/transcript_backend/" + "09_14_Test10.wav",
+				dataType: "html",
+				async: true,
+				success: function(html) {
+					$("#scriptText").html(html);
+					$('.ajaxProgress').hide();
+				}
+
+
+			})
+ 		});
+		
+	
+	
+	</script>
+
 {% endblock %}

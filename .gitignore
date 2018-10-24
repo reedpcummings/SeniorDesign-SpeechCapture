@@ -10,3 +10,5 @@ s_a/homepage/views.py
 s_a/s_a/.DS_Store
 s_a/s_a/settings.py
 s_a/s_a/__pycache__/settings.cpython-36.pyc
+Django Webapp/mysite/webapp/keys.txt
+Django Webapp/mysite/test_audio.wav

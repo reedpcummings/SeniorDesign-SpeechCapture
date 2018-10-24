@@ -4,13 +4,13 @@ function upload(blob) {
     form.append('audio_test', blob);
 
     $.ajax({
-        url: 'http://localhost:8000/transcribe/record2/',
+        url: 'http://localhost:8000/upload/',
         type: 'POST',
         data: form,
         processData: false,
         contentType: false,
         success: function (data) {
-            console.log('response' + JSON.stringify(data));
+            console.log('response' + (data));
         },
         error: function () {
             console.log("you dun messed up")
