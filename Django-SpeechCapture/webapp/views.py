@@ -21,7 +21,7 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 def index(request):
     directory_old = os.listdir(os.path.join(os.getcwd(), "webapp", "static"))
     directory_new = os.listdir(os.path.join(os.getcwd(), "webapp", "static", "webapp"))
-    return render(request, 'webapp/home.html', {'directory': directory_new, 'directory2': directory_old})
+    return render(request, 'webapp/home.html')
 
 def transcript1(request):
 
