@@ -1,1 +1,0 @@
-{"aws_access_key_id":"AKIAICSNDON3JDXZLU6A","aws_secret_access_key":"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"}
