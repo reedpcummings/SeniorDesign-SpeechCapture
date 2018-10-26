@@ -25,7 +25,7 @@ SECRET_KEY = '((95k_0ep%a278$#@7=(_%xe4$4@8)4wc=40yb+4op2qa+(jo1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','speechcaptureapp-env.itx2kaduqp.us-west-2.elasticbeanstalk.com']
+ALLOWED_HOSTS = ['127.0.0.1','speechcaptureapp-env.itx2kaduqp.us-west-2.elasticbeanstalk.com', 'localhost']
 
 
 # Application definition
