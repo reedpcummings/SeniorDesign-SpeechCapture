@@ -11,6 +11,8 @@ from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
 
 from .models import Transcription
+from django.views.decorators.csrf import csrf_exempt
+
 
 
 def index(request):
@@ -34,16 +36,16 @@ def results(request, transcription_id):
 	context = {'transList': transList}
 	return render(request, 'homepage/index.html', context)
 
+@csrf_exempt
+def upload(request):
+	audio_file = request.FILES['audio_test'].read()
+	file = open('test_audio.wav', 'wb')
+	file.write(audio_file)
+	file.close()
 
+	audio_name = request.FILES['audio_test'].name
+	s3_client = boto3.client('s3')
 
-	# for t in latest_transcription_list:
+	s3_client.upload_file(Filename= 'test_audio.wav', Bucket='sa-doc-upload', Key=audio_name)
 
-	# 	output = str(t.id) + "\n\tTEXT: " + ', '.join([t.text])
-	# 	output += '\n\t\t' + str(t.key_phrases)
-	# 	output += '\n\t\t\t' + str(t.language)
-	# 	output += '\n\t\t\t\t' + str(t.sentiment)
-	# return HttpResponse(output)
-	#response = "You're looking at the results of transcription %s."
-	#return HttpResponse(response % transcription_id)
-# Create your views here.
-
+	return HttpResponse("Good")

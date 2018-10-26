@@ -135,49 +135,9 @@
     <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.12.min.js"></script>
 
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
 <script>
-function upload(blob) {
-    //AJAX upload BLOB
-    var form = new FormData();
-    form.append('audio_test', blob);
-    var s3 = new AWS.S3({
-          accessKeyId: '',
-          secretAccessKey: ''
-        });
-
-    var uploadPreSignedUrl = s3.getSignedUrl('putObject', {
-        Bucket: 'sa-doc-upload',
-        Key: 'audio_test',
-        ACL: 'authenticated-read',
-        // This must match with your ajax contentType parameter
-        ContentType: 'audio/wav'
-        
-
-        /* then add all the rest of your parameters to AWS puttObect here */
-    });
-
-    console.log(uploadPreSignedUrl)
-
-
-    $.ajax({
-        // url: 'http://localhost:8000/transcribe/record_ajax/',
-        url: uploadPreSignedUrl,
-
-        type: 'POST',
-        data: form,
-        processData: false,
-        contentType: 'audio/wav',
-        success: function (data) {
-            console.log('response' + JSON.stringify(data));
-        },
-        error: function () {
-            console.log("you dun messed up")
-        }
-    });
-}
-    </script>
-
-    <script>
 //webkitURL is deprecated but nevertheless
 URL = window.URL || window.webkitURL;
 
@@ -206,36 +166,29 @@ clearButton.addEventListener("click", clearRecording);
 uploadExistingFileButton.addEventListener("click", uploadExistingFile);
 
 function uploadExistingFile() {
-    var bucketName = 'sa-doc-upload';
-    // var credentials = new AWS.SharedIniFileCredentials({profile: 'default'});
-    // AWS.config.credentials = credentials;
-    var s3 = new AWS.S3({
-        accessKeyId: '',
-        secretAccessKey: '',
-        apiVersion: '2006-03-01',
-        params: {Bucket: bucketName}
-    });
 
     var files = document.getElementById('file').files;
     if (!files.length) {
         return alert('Please choose a file to upload first.');
     }
     var file = files[0];
-    var fileName = file.name;
-    var albumAudioKey = encodeURIComponent(bucketName) + '//';
 
-    // var audioKey = albumAudioKey + fileName;
-    var audioKey = 'testing/' + fileName;
-    s3.upload({
-    Key: audioKey,
-    Body: file,
-    ContentType: file.type,
-    ACL: 'public-read'
-    }, function(err, data) {
-    if (err) {
-      return alert('There was an error uploading your photo: ', err.message);
-    }
-    alert('Successfully uploaded photo.');
+    //AJAX upload BLOB
+    var form = new FormData();
+    form.append('audio_test', file);
+
+    $.ajax({
+        url: 'http://localhost:8000/homepage/upload/',
+        type: 'POST',
+        data: form,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            console.log('response' + (data));
+        },
+        error: function () {
+            console.log("you dun messed up")
+        }
     });
 }
 
@@ -352,7 +305,7 @@ function stopRecording() {
   //create the wav blob and pass it on to createDownloadLink
     rec.exportWAV(createDownloadLink);
     // rec.exportWAV(addAudioToS3);
-    rec.exportWAV(upload);
+    // rec.exportWAV(upload);
 }
 
 function createDownloadLink(blob) {
@@ -385,18 +338,33 @@ function createDownloadLink(blob) {
   
   //upload link
   var upload = document.createElement('a');
-  var bucketName = 'sa-doc-upload';
+  var testString = 'outside'
   upload.href="#";
   upload.innerHTML = "Upload";
   upload.addEventListener("click", function(event){
-    var bucketRegion = 'us-west-2';
+    
+    // var blob = new File([blob], filename+".mp3 ");
 
+    // console.log('after conversion')
+    // console.log (blob.size)
+    //AJAX upload BLOB
 
-    xhr.onload=function(e) {
-      if(this.readyState === 4) {
-          console.log("Server returned: ",e.target.responseText);
-      }
-    };
+    var form = new FormData();
+    form.append('audio_test', blob, filename + ".wav");
+
+    $.ajax({
+        url: 'http://localhost:8000/homepage/upload/',
+        type: 'POST',
+        data: form,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            console.log('response' + (data));
+        },
+        error: function () {
+            console.log("you dun messed up")
+        }
+    });
   });
   li.appendChild(document.createTextNode (" "))//add a space in between
   li.appendChild(upload)//add the upload link to li
