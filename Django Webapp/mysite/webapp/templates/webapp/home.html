@@ -8,7 +8,11 @@
 		  <header class="jumbotron my-4 topElement">
 			<h2 class="display-5">Meeting Transciption & Analysis</h2>
 			<p class="lead">Use this App to record meetings for transcription and further Natural Language Processing analysis.</p>
-			<a href="#" class="btn btn-primary btn-med">Create Account</a>
+			{% if user.is_authenticated %}
+			  <h4>Hi {{user.username}} !</h4>
+		  	{% else %}
+		  		<a href="{% url 'register' %}" class="btn btn-primary btn-med">Create Account</a>
+		  	{% endif %}
 		  </header>
 
 		  <!-- Page Features -->

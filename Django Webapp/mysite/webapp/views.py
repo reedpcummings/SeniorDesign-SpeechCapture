@@ -2,6 +2,7 @@ import os, time, json, boto3
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, get_user
 from django.views.generic import View
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Recordings, Transcriptions, Analysis
 from .forms import UserForm
@@ -91,7 +92,7 @@ def history(request):
 
 class UserFormView(View):
     form_class = UserForm
-    template_name = 'webapp/registration.html'
+    template_name = 'webapp/register.html'
 
     # Display form
     def get(self, request):
@@ -99,6 +100,7 @@ class UserFormView(View):
         return render(request, self.template_name, {'form': form})
 
     # Process form
+    @csrf_exempt
     def post(self, request):
         form = self.form_class(request.POST)
 
@@ -118,7 +120,7 @@ class UserFormView(View):
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    return redirect('webapp:index')
+                    return redirect('/')
         # Login failed
         return render(request, self.template_name, {'form': form})
 
