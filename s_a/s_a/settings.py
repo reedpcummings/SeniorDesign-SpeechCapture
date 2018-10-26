@@ -19,8 +19,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'pb$m5@_%g3y(nd7*5mrmsw0+-j$86%vnpur)@9qc0298)k2r@y'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -119,3 +119,29 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'mysite/static'),
+# ]
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'test'
+# AWS_ACCESS_KEY_ID = os.environ.get("aws_access_key_id", "") 
+# AWS_SECRET_ACCESS_KEY = os.environ.get("aws_secret_access_key", "")
+# AWS_STORAGE_BUCKET_NAME = 'sa-doc-upload'
+# AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+# AWS_LOCATION = 'static'
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'homepage/static'),
+]
+
+# DEFAULT_FILE_STORAGE = 's_a.storage_backends.MediaStorage'  # <-- here is where we reference it
