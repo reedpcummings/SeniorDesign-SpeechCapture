@@ -13,8 +13,6 @@ from .models import Recordings, Transcriptions, Analysis
 from .forms import UserForm
 
 from django.http import HttpResponse
-#from .libs import Comprehend
-#from .libs import Transcribe
 
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
