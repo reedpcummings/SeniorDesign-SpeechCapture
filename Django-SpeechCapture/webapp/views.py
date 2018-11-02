@@ -82,7 +82,8 @@ def transcript_backend(request, fileName):
         Media={'MediaFileUri': job_uri},
         MediaFormat='wav',
         LanguageCode='en-US',
-        OutputBucketName='test-speechcapture'
+        OutputBucketName='test-speechcapture',
+         Settings={'ShowSpeakerLabels': True, 'MaxSpeakerLabels': 2}
     )
     
     while True:
