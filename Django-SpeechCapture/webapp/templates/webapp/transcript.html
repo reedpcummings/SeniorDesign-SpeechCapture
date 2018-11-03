@@ -10,10 +10,10 @@
 				<button type="button" class="btn btn-secondary">Upload Audio File</button>
 			</div>
 			<div class="col text-center">
-				<a href="" id="saveButton"><button type="button" class="btn btn-secondary">Save Text</button></a>
+				<a href="#" id="saveButton" class="btn btn-secondary" download="transcript.txt">Save Text</a>
 			</div>
 			<div class="col text-center">
-				<button type="button" class="btn btn-secondary">Go to Analysis</button>
+				<a id="analysisBtn" href="#" class="btn btn-secondary">Go to Analysis</a>
 			</div>
 		</div>
 	</div>
@@ -45,22 +45,26 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('.ajaxProgress').show();
-			
+			var fileName = "{{fileName}}";
 			$.ajax({
 				type: "GET",
-				url: "http://127.0.0.1:8000/transcript_backend/" + "09_14_Test10.wav",
+				url: "http://localhost:8000/transcript_backend/" + fileName,
 				dataType: "html",
 				async: true,
 				success: function(html) {
 					$("#scriptText").html(html);
 					$('.ajaxProgress').hide();
 				}
-
-
 			})
  		});
 		
-	
+		var fileName = "{{fileName}}";
+		var analysisFile = fileName.replace(".wav", ".json");
+		var transcriptFile = fileName.replace(".wav", ".txt");
+
+		document.getElementById("analysisBtn").href="http://localhost:8000/analysis/" + analysisFile;
+		document.getElementById("saveButton").href="https://s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
+		 
 	
 	</script>
 
