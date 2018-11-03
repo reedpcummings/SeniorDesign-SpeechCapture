@@ -10,3 +10,4 @@ s_a/homepage/views.py
 s_a/s_a/.DS_Store
 s_a/s_a/settings.py
 s_a/s_a/__pycache__/settings.cpython-36.pyc
+s_a/test_audio.wav

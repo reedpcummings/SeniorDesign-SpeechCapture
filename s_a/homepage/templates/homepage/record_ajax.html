@@ -111,25 +111,52 @@
 <body>
     <h1>Interview Recorder</h1>
     <section class="main-controls">
-        <canvas class="visualizer" height="500px"></canvas>
+        <canvas class="visualizer" height="300px"></canvas>
         <div id="controls">
             <button id="recordButton">Record</button>
             <button id="pauseButton" disabled>Pause</button>
             <button id="stopButton" disabled>Stop</button>
             <button id="clearButton" >Clear</button>
-            <button id="uploadExistingFileButton" >Upload File</button>
+            
         </div>
-        <div>
-            <label for="avatar">Select a recording:</label>
+
+    <br>
+    </br> 
+    </section>
+    <section class="upload-local">
+            <label for="avatar">Select a recording from your disk:</label>
             <input type="file"
                    id="file" name="file"
                    accept="audio/wav, audio/mp3" />
-        </div>
+            <button id="uploadExistingFileButton" >Upload Local File</button>
+        
 
     </section>
+
+    <br>
+    </br>
+
     <div id="formats">Format: start recording to see sample rate</div>
     <h3>Recordings</h3>
     <ol id="recordingsList"></ol>
+
+    <br>
+    </br>
+
+    <label for="s3-file-select">Choose a file from S3:</label>
+
+    <select id="s3-file-select">
+        <option value="">--Please choose an option--</option>
+        {% if s3AudioList %}
+            {% autoescape off %}
+            {% for audio in s3AudioList %}
+                <option value={{audio}}>{{audio}}</option>
+            {% endfor %}
+            {% endautoescape %}
+        {% endif %}
+    </select>
+
+    <button id="transcribeButton" >Transcribe</button>
 
     <!-- inserting these scripts at the end to be able to use all the elements in the DOM -->
     <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
@@ -164,6 +191,16 @@ stopButton.addEventListener("click", stopRecording);
 pauseButton.addEventListener("click", pauseRecording);
 clearButton.addEventListener("click", clearRecording);
 uploadExistingFileButton.addEventListener("click", uploadExistingFile);
+transcribeButton.addEventListener("click", transcribeFile);
+
+function transcribeFile() {
+    var select = document.getElementById("s3-file-select");
+
+    if (select.selectedIndex == -1 || select.options[select.selectedIndex].text == '--Please choose an option--')
+        return alert("Please select a valid file from the dropdown.");
+
+    return alert("Transcribing " + select.options[select.selectedIndex].text)
+}
 
 function uploadExistingFile() {
 
@@ -185,6 +222,19 @@ function uploadExistingFile() {
         contentType: false,
         success: function (data) {
             console.log('response' + (data));
+            // fName = file.name;
+            // console.log(fName);
+            // var dropdown = document.getElementById("s3-file-select");
+            // var option = document.createElement(fName);
+            // option.text = fName;
+            // dropdown.add(option);
+
+            // for (var i = 0; i < dropdown.options.length; i++) {
+            //     if (dropdown.options[i].text === fName) {
+            //         dropdown.selectedIndex = i;
+            //         break;
+            //     }
+            // }
         },
         error: function () {
             console.log("you dun messed up")
@@ -365,6 +415,8 @@ function createDownloadLink(blob) {
             console.log("you dun messed up")
         }
     });
+
+
   });
   li.appendChild(document.createTextNode (" "))//add a space in between
   li.appendChild(upload)//add the upload link to li
@@ -429,6 +481,9 @@ function visualize(stream) {
     }
 }
 
+window.onload = function() {
+
+};
 
 window.onresize = function () {
     canvas.width = mainSection.offsetWidth;

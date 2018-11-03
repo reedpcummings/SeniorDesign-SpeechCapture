@@ -20,7 +20,15 @@ def index(request):
 
 
 def record(request):
-    return render(request, 'homepage/record_ajax.html')
+	s3AudioList = []
+	s3_client = boto3.client('s3')
+	for key in s3_client.list_objects(Bucket='sa-doc-upload')['Contents']:
+		if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav':
+			print(key['Key'])
+			s3AudioList.append(key['Key'])
+	context = {'s3AudioList':s3AudioList}
+	return render(request, 'homepage/record_ajax.html', context)
+    # return render(request, 'homepage/record_ajax.html')
 
 def results(request, transcription_id):
 	#comprehend = boto3.client(service_name='comprehend', region_name='us-west-2', aws_access_key_id="", aws_secret_access_key="" )
@@ -48,4 +56,11 @@ def upload(request):
 
 	s3_client.upload_file(Filename= 'test_audio.wav', Bucket='sa-doc-upload', Key=audio_name)
 
+	return HttpResponse("Good")
+
+def showAudioFiles(request):
+	# s3_client = boto3.client('s3')
+	# for key in s3_client.list_objects(Bucket='sa-doc-upload')['Contents']:
+	# 	if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav':
+	# 		print(key['Key'])
 	return HttpResponse("Good")
