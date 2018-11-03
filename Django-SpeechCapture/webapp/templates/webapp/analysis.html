@@ -1,5 +1,57 @@
 {% extends "webapp/header.html" %}
 
 {% block transcript %}
+    <div class="container scroll">
+		<div class="card">
+			<div class="card-body">
+				<div style="border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">
+                    {% for key,value in data.items %}
+                        <div class="card">
+							<div class="card-body">
+								<h5 class="card-title">{{key}}</h5>
+								<div class="container-fluid">
+									<a class="btn btn-primary" data-toggle="collapse" data-target="#summary{{value.Index}}" role="button" aria-expanded="false">Summary</a>
+									<div class="collapse" id="summary{{value.Index}}">
+										<div class="card card-body">
+											{{value.Summary|linebreaks}}
+										</div>
+									</div>
+								</div>
+								<div class="container-fluid">
+									<a class="btn btn-primary" data-toggle="collapse" data-target="#questions{{value.Index}}" role="button" aria-expanded="false">Q&A</a>
+									<div class="collapse" id="questions{{value.Index}}">
+										<div class="card card-body">
+											{{value.Questions|linebreaks}}
+										</div>
+									</div>
+								</div>
+								<div class="container-fluid">
+									<a class="btn btn-primary" data-toggle="collapse" data-target="#metadata{{value.Index}}" role="button" aria-expanded="false">Metadata</a>
+									<div class="collapse" id="metadata{{value.Index}}">
+										<div class="card card-body">
+											<b>Keywords:</b> {{value.Keywords}}
+											<br/>
+											<br/>
+											<b>Entities:</b> {{value.Entities}}
+											<br/>
+											<br/>
+											<b>Sentiment:</b>
+											Positive: {{value.Sentiment.positive}}
+											<br/>
+											Negative: {{value.Sentiment.negative}}
+											<br/>
+											Mixed: {{value.Sentiment.mixed}}
+											<br/>
+											Neutral: {{value.Sentiment.neutral}}
+										</div>
+									</div>
+								</div>
+							</div>
+                        </div>
+                    {% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
 
 {% endblock %}

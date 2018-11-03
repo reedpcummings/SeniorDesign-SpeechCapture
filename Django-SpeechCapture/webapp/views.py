@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import Recordings, Transcriptions, Analysis
 from .forms import UserForm
+from .libs import Analysis
 
 from django.http import HttpResponse
 
@@ -112,7 +113,10 @@ def record(request):
     return render(request, 'webapp/record.html')
 
 def analysis(request):
-    return render(request, 'webapp/analysis.html')
+    f = open("webapp/libs/testinterview.txt", 'r')
+    content = f.read()
+    entityDict = Analysis.GetAllAttributes(content, 10)
+    return render(request, 'webapp/analysis.html', {'data': entityDict})
 
 def history(request):
     request.user = get_user(request)
@@ -155,11 +159,3 @@ class UserFormView(View):
                     return redirect('/')
         # Login failed
         return render(request, self.template_name, {'form': form})
-
-
-
-# def compView(request):
-#     lang = Comprehend.langCode()
-#     context = {'one': "itemOne", 'two': "itemTwo",'lang': lang}
-#     jsonData = simplejson.dumps(context)
-#     return render(request, 'webapp/home.html', {'data': jsonData})
