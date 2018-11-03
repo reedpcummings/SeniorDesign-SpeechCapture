@@ -18,7 +18,8 @@
 		</div>
 		<div class="row">
 			<div class="col text-center">
-				<button id="gotoTranscribeButton" type="button" class="btn btn-secondary">Transcribe Audio</button>
+				<a href="https://google.com" id="transcribeLink">Transcribe Audio</a>
+				<button id="gotoTranscribeButton" type="button" class="btn btn-secondary" >Transcribe Audio</button>
 			</div>
 		</div>
 		
@@ -26,5 +27,14 @@
 		<h3>Recordings</h3>
 		<ol id="recordingsList"></ol>
 		
+		<script>
+			// $("#transcribeLink").on("click", function(e) {
+			// 	e.preventDefault();
+			// 	var thisHref = $("#transcribeLink").attr('href');
+			// 	//alert($("#transcribeLink").attr('href'));
+			// 	window.location.href = $("#transcribeLink").attr('href');  
+			// });
+		</script>
+
 	</div>
 {% endblock %}
