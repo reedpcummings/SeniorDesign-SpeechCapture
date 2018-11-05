@@ -14,3 +14,6 @@ rsa==3.4.2
 s3transfer==0.1.13
 six==1.11.0
 urllib3==1.23
+nltk==3.3
+pytextrank==1.1.0
+mysqlclient==5.7.23
