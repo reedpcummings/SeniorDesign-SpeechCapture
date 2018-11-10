@@ -7,6 +7,9 @@ from django.http import HttpResponse
 from django.template import loader
 import boto3
 import json
+import re
+import time
+import datetime
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
 
@@ -17,6 +20,54 @@ from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
     return HttpResponse("Hello, world. You're at the homepage index.")
+
+@csrf_exempt
+def transcribe(request):
+	print (request.body)
+	if request.method == 'POST':
+		req = json.loads(request.body)
+		print ('POST: looking at entries')
+		# for entry in request.body:
+		# 	print (entry)
+		for key in req:
+			print (key),
+			print (req[key])
+			if key == 'fileName':
+				# print ('fileName')
+				# fileName = request.POST['fileName']
+				fileName = req[key]
+				now = datetime.datetime.now()
+				# job_name = str(now)
+				# job_name = re.sub('\.wav$', '', fileName)
+				job_name = fileName
+				job_uri = "https://s3-us-west-2-amazonaws.com/sa-doc-upload/" + fileName
+				newFileName = fileName.replace(".wav",".json")
+
+				s3_client = boto3.client('s3')
+				transcribe_client = boto3.client('transcribe')
+				transcribe_client.start_transcription_job(
+					TranscriptionJobName=job_name,
+					Media={'MediaFileUri': job_uri},
+					MediaFormat='wav',
+					LanguageCode='en-US',
+					OutputBucketName='sa-doc-upload',
+					Settings={'ShowSpeakerLabels': True, 'MaxSpeakerLabels': 2}
+			    )
+				while True:
+					status = transcribe_client.get_transcription_job(TranscriptionJobName=job_name)
+					if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:
+						break
+					print("Not ready yet...")
+					time.sleep(5)
+
+				result = s3_client.get_object(Bucket='sa-doc-upload', Key= (job_name + '.json'))
+			    
+			    # Read the object (not compressed):
+				text = result["Body"].read().decode()
+			    
+				data = json.loads(text)
+				print (data)
+	return HttpResponse("Good")
 
 
 def record(request):

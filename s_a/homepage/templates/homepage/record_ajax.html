@@ -198,8 +198,22 @@ function transcribeFile() {
 
     if (select.selectedIndex == -1 || select.options[select.selectedIndex].text == '--Please choose an option--')
         return alert("Please select a valid file from the dropdown.");
+    var fName = {'fileName' : select.options[select.selectedIndex].text}
+    // return alert("Transcribing " + select.options[select.selectedIndex].text)
+    $.ajax({
+        url: 'http://localhost:8000/homepage/transcribe/',
+        type: 'POST',
+        data: JSON.stringify(fName),
+        processData: false,
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            console.log('successfully transcribed' + (data));
+        },
+        error: function () {
+            console.log("you dun messed up")
+        }
+    });
 
-    return alert("Transcribing " + select.options[select.selectedIndex].text)
 }
 
 function uploadExistingFile() {
@@ -222,19 +236,21 @@ function uploadExistingFile() {
         contentType: false,
         success: function (data) {
             console.log('response' + (data));
-            // fName = file.name;
-            // console.log(fName);
-            // var dropdown = document.getElementById("s3-file-select");
-            // var option = document.createElement(fName);
-            // option.text = fName;
-            // dropdown.add(option);
+            fName = file.name;
+            console.log(fName);
+            var dropdown = document.getElementById("s3-file-select");
 
-            // for (var i = 0; i < dropdown.options.length; i++) {
-            //     if (dropdown.options[i].text === fName) {
-            //         dropdown.selectedIndex = i;
-            //         break;
-            //     }
-            // }
+            // give the option a random tag (ie, current date)
+            var option = document.createElement('option');
+            option.text = fName;
+            dropdown.add(option);
+
+            for (var i = 0; i < dropdown.options.length; i++) {
+                if (dropdown.options[i].text === fName) {
+                    dropdown.selectedIndex = i;
+                    break;
+                }
+            }
         },
         error: function () {
             console.log("you dun messed up")
@@ -368,20 +384,33 @@ function createDownloadLink(blob) {
   //name of .wav file to use during upload and download (without extendion)
   var filename = new Date().toISOString();
 
+
   //add controls to the <audio> element
   au.controls = true;
   au.src = url;
 
   //save to disk link
   link.href = url;
-  link.download = filename+".wav"; //download forces the browser to donwload the file using the  filename
+
+  var name = prompt("Please enter the name of the recording", filename);
+
+  if (name == null) {
+    downloadName = filename+".wav";
+  }
+  else {
+    downloadName = name+".wav";
+  }
+
+  // link.download = filename+".wav"; //download forces the browser to donwload the file using the  filename
+  link.download = downloadName
   link.innerHTML = "Save to disk";
 
   //add the new audio element to li
   li.appendChild(au);
   
   //add the filename to the li
-  li.appendChild(document.createTextNode(filename+".wav "))
+  // li.appendChild(document.createTextNode(filename+".wav "))
+  li.appendChild(document.createTextNode(downloadName))
 
   //add the save to disk link to li
   li.appendChild(link);
@@ -400,7 +429,8 @@ function createDownloadLink(blob) {
     //AJAX upload BLOB
 
     var form = new FormData();
-    form.append('audio_test', blob, filename + ".wav");
+    // form.append('audio_test', blob, filename + ".wav");
+    form.append('audio_test', blob, downloadName);
 
     $.ajax({
         url: 'http://localhost:8000/homepage/upload/',
@@ -410,6 +440,19 @@ function createDownloadLink(blob) {
         contentType: false,
         success: function (data) {
             console.log('response' + (data));
+            var dropdown = document.getElementById("s3-file-select");
+
+            // give the option a random tag (ie, current date)
+            var option = document.createElement('option');
+            option.text = downloadName;
+            dropdown.add(option);
+
+            for (var i = 0; i < dropdown.options.length; i++) {
+                if (dropdown.options[i].text === downloadName) {
+                    dropdown.selectedIndex = i;
+                    break;
+                }
+            }
         },
         error: function () {
             console.log("you dun messed up")

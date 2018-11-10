@@ -8,5 +8,5 @@ urlpatterns = [
     url(r'^record', views.record, name='record'),
     url(r'^upload', views.upload, name='upload'),
     url(r'^getS3', views.showAudioFiles, name='getS3'),
-
+    url(r'^transcribe', views.transcribe, name='transcribe'),
 ]
