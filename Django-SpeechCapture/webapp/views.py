@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import Recordings, Transcriptions, Analysis
 from .forms import UserForm
-#from .libs import Analysis
+from .libs import Analysis
 
 from django.http import HttpResponse
 
@@ -170,6 +170,30 @@ def transcript_backend(request, fileName):
     
 
     #print(data['results']['speaker_labels']['segments'])
+    key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
+    
+    keys = key_file.read()
+    key_file.close()
+    keys_json = json.loads(keys)
+    
+    s3_client = boto3.client('s3',
+                             aws_access_key_id=keys_json['aws_access_key_id'],
+                             aws_secret_access_key=keys_json['aws_secret_access_key'],
+                             region_name='us-west-2'
+                             )
+
+    print(fileName.replace(".wav",".txt"))
+
+    textFileName = fileName.replace(".wav",".txt")
+
+    with open(textFileName, 'w') as text_file:
+        print(test1, file=text_file)
+
+    s3_client.upload_file(Filename=os.path.join(os.getcwd(), textFileName), Bucket='test-speechcapture', Key=textFileName, ExtraArgs={'ACL':'public-read'})
+
+    os.remove(textFileName)
+
+    test1 = "<p>" + test1 + "</p>"
 
 
 
