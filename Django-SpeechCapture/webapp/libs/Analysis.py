@@ -2,11 +2,24 @@ import pytextrank
 import sys, json, boto3, awscli, re
 from nltk import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
+import os
 stopWords = set(stopwords.words('english'))
 
 stepOnePath = "webapp/libs/step1.json"
 stepTwoPath = "webapp/libs/step2.json"
 stepThreePath = "webapp/libs/step3.json"
+
+key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
+    
+keys = key_file.read()
+key_file.close()
+keys_json = json.loads(keys)
+
+comprehend = boto3.client('comprehend',
+                            aws_access_key_id=keys_json['aws_access_key_id'],
+                            aws_secret_access_key=keys_json['aws_secret_access_key'],
+                            region_name='us-west-2'
+                            )
 
 def GetAllAttributes(content, numEntities):
     entityDict = {}
@@ -40,7 +53,7 @@ def GetAllAttributes(content, numEntities):
 # from 0.0 to 1.0
 def ExtractSentiments(entity, content):
     sents = ExtractSentences(entity, content)
-    comprehend = boto3.client(service_name='comprehend', region_name='us-west-2')
+    #comprehend = boto3.client(service_name='comprehend', region_name='us-west-2')
     entitySentiment = {"positive": 0.0, "negative": 0.0, "mixed": 0.0, "neutral": 0.0}
     sents = ' '.join(sents)
     if sents.__len__() > 4500:
@@ -142,7 +155,8 @@ def ExtractEntities(content, numEntities):
 # Create a comprehend object and run the Detect Entities function
 def __DetectEntities(content):
     # Create the comprehend object
-    comprehend = boto3.client(service_name='comprehend', region_name='us-west-2')
+
+    #comprehend = boto3.client(service_name='comprehend', region_name='us-west-2')
 
     # Split the string
     if content.__len__() > 4500:

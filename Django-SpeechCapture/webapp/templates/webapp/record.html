@@ -10,6 +10,27 @@
 		</div>
 		<div class="row">
 			<div class="col text-center">
+
+				<label for="s3-file-select">Choose a file from S3:</label>
+
+				<select id="s3-file-select">
+					<option value="">--Please choose an option--</option>
+					{% if s3AudioList %}
+						{% autoescape off %}
+						{% for audio in s3AudioList %}
+							<option value={{audio}}>{{audio}}</option>
+						{% endfor %}
+						{% endautoescape %}
+					{% endif %}
+				</select>
+
+				<section class="upload-local">
+					<label for="avatar">Select a recording from your disk:</label>
+					<input type="file"
+						   id="file" name="file"
+						   accept="audio/wav, audio/mp3" />
+					<button id="uploadExistingFileButton" >Upload Local File</button>
+				</section>
 				
 				<button id="recordButton" type="button" class="btn btn-secondary">Record</button>
 				<button id="pauseButton" type="button" class="btn btn-secondary" disabled>Pause</button>
@@ -18,8 +39,10 @@
 		</div>
 		<div class="row">
 			<div class="col text-center">
-				<a href="https://google.com" id="transcribeLink">Transcribe Audio</a>
-				<button id="gotoTranscribeButton" type="button" class="btn btn-secondary" >Transcribe Audio</button>
+				<button id="transcribeButton" type="button" class="btn btn-secondary">Transcribe Audio</button>
+				<!-- <a href="https://google.com" id="transcribeLink" class="btn btn-secondary">Transcribe Audio</a> -->
+				<!-- <button id="transcribeButton" >Transcribe</button>
+				<button id="gotoTranscribeButton" type="button" class="btn btn-secondary" >Transcribe Audio</button> -->
 			</div>
 		</div>
 		
@@ -28,12 +51,7 @@
 		<ol id="recordingsList"></ol>
 		
 		<script>
-			// $("#transcribeLink").on("click", function(e) {
-			// 	e.preventDefault();
-			// 	var thisHref = $("#transcribeLink").attr('href');
-			// 	//alert($("#transcribeLink").attr('href'));
-			// 	window.location.href = $("#transcribeLink").attr('href');  
-			// });
+
 		</script>
 
 	</div>
