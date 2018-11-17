@@ -21,13 +21,14 @@
 	<div class="container scroll">
 		<div class="card">
 			<div class="card-body">
-				<div style="border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">
-					<p id="scriptText">
+				<div style="border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;white-space: pre-line;">
+					<p id="scriptText" style="white-space: pre;">
 						<div class="ajaxProgress">
 							<h3>Please Wait...</h3>
 							<img src= "{% static 'webapp/img/ajax-loader.gif' %}"/>
 						</div>
-						{{value}}
+
+						<!-- {{value}} -->
 						<!-- {{data}} -->
 
 						<!-- {% for key,value in data.items %}
@@ -54,6 +55,9 @@
 				success: function(html) {
 					$("#scriptText").html(html);
 					$('.ajaxProgress').hide();
+
+					$("#scriptText").css("white-space", "nowrap")
+					$("#scriptText").css("white-space", "pre-line")
 				}
 			})
  		});
