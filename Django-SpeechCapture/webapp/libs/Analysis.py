@@ -1,12 +1,101 @@
 import pytextrank
 import sys, json, boto3, awscli, re
-from nltk import word_tokenize, sent_tokenize
+from nltk import word_tokenize, sent_tokenize, pos_tag
 from nltk.corpus import stopwords
+from nltk.stem import SnowballStemmer
 stopWords = set(stopwords.words('english'))
 
 stepOnePath = "webapp/libs/step1.json"
 stepTwoPath = "webapp/libs/step2.json"
 stepThreePath = "webapp/libs/step3.json"
+
+def GenerateUseCase(content):
+    questionDict, answerDict = ExtractAllQuestions(content)
+    snowball_stemmer = SnowballStemmer("english")
+    nameIndex = -1
+    idIndex = -1
+    actorIndex = -1
+    precondtionIndex = -1
+    postconditionIndex = -1
+    normalFlowIndex = -1
+    alternativeFlowIndex = -1
+    for key, value in questionDict.items():
+        for sent in value:
+            wpFound = False
+            postFound = False
+            normalFlowFound = False
+            alternativeFlowFound = False
+            tokens = word_tokenize(sent)
+            tokens = [word.lower() for word in tokens]
+            tagged = pos_tag(tokens)
+            for items in tagged:
+                if items[1] == 'WP':
+                    wpFound = True
+                    continue
+                if items[0] == 'normal':
+                    normalFlowFound = True
+                    continue
+                if items[0] == 'alternative':
+                    alternativeFlowFound = True
+                    continue
+                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("actor"):
+                    actorIndex = key
+                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("name"):
+                    nameIndex = key
+                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("id"):
+                    idIndex = key
+                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("precondition"):
+                    precondtionIndex = key
+                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("post"):
+                    postFound = True
+                    continue
+                if wpFound and postFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("condition"):
+                    postconditionIndex = key
+                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("flow"):
+                    if normalFlowFound:
+                        normalFlowIndex = key
+                    elif alternativeFlowFound:
+                        alternativeFlowIndex = key
+                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("precondition"):
+                    precondtionIndex = key
+                alternativeFlowFound = False
+                normalFlowFound = False
+
+    name = "Generated Use Case"
+    id = "UC - 1"
+    actors = "No Actors found."
+    preconditions = "No Preconditions found."
+    postconditions = "No Postconditions found."
+    normalFlow = "No Normal Flow found."
+    altFlow = "No Alternative Flow found."
+    if nameIndex != -1:
+        name = ' '.join(answerDict[nameIndex])
+    if idIndex != -1:
+        id = ' '.join(answerDict[idIndex])
+    if actorIndex != -1:
+        actors = ' '.join(answerDict[actorIndex])
+    if precondtionIndex != -1:
+        preconditions = ' '.join(answerDict[precondtionIndex])
+    if postconditionIndex != -1:
+        postconditions = ' '.join(answerDict[postconditionIndex])
+    if normalFlowIndex != -1:
+        normalFlow = ' '.join(answerDict[normalFlowIndex])
+    if alternativeFlowIndex != -1:
+        altFlow = ' '.join(answerDict[alternativeFlowIndex])
+
+    preconditions = ' '.join(answerDict[precondtionIndex])
+    altFlow = ' '.join(answerDict[alternativeFlowIndex])
+
+    usecase_dict = {"Name": name,
+                    "ID": id,
+                    "Description": None,
+                    "Preconditions": preconditions,
+                    "Postconditions": postconditions,
+                    "Actors": actors,
+                    "Normal Flow": normalFlow,
+                    "Alternative Flow": altFlow}
+    return usecase_dict
+
 
 def GetAllAttributes(content, numEntities):
     entityDict = {}
