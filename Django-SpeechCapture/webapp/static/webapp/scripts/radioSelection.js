@@ -1,14 +1,22 @@
 $(document).ready(function(){
-	document.getElementById('cardText').innerHTML = compData["one"];
-	$("#infoType").change(function () {
-		if ($("#option1").is(":checked")) {
-			document.getElementById('cardText').innerHTML = compData["one"];
-		}
-		else if ($("#option2").is(":checked")){
-			document.getElementById('cardText').innerHTML = compData["two"];
-		}
-		else if ($("#option3").is(":checked")){
-			document.getElementById('cardText').innerHTML = compData["lang"];
-		}
-	});
+    $(document.getElementById('summaryCont')).show();
+    $(document.getElementById('questionCont')).hide();
+    $(document.getElementById('useCaseCont')).hide();
+    $(document.getElementById('summary')).click(function() {
+        $(document.getElementById('summaryCont')).show();
+        $(document.getElementById('questionCont')).hide();
+        $(document.getElementById('useCaseCont')).hide();
+    });
+
+    $(document.getElementById('questions')).click(function() {
+	    $(document.getElementById('questionCont')).show();
+	    $(document.getElementById('summaryCont')).hide();
+	    $(document.getElementById('useCaseCont')).hide();
+    });
+
+    $(document.getElementById('useCases')).click(function() {
+	    $(document.getElementById('useCaseCont')).show();
+	    $(document.getElementById('summaryCont')).hide();
+        $(document.getElementById('questionCont')).hide();
+    });
 });
