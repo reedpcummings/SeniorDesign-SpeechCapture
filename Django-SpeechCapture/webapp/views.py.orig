@@ -194,7 +194,12 @@ def transcript(request, fileName):
 
 @csrf_exempt
 def record(request):
+<<<<<<< HEAD
+    s3AudioList = []
+    #s3_client = boto3.client('s3')
+=======
     s3AudioList = [] #will be the list of files that are stored in S3, will be in the dropdown on the record page
+>>>>>>> cb909bf5fc3104c08bc0aa50b48e67bf25650d32
 
     #open the file that contains the AWS access keys
     key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
@@ -215,11 +220,17 @@ def record(request):
     
     #iterate through files in S3
     for key in s3_client.list_objects(Bucket='test-speechcapture')['Contents']:
+<<<<<<< HEAD
+        if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav':
+            print(key['Key'])
+            s3AudioList.append(key['Key'])
+=======
 	    if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
 		    print(key['Key']) #log(print) the file name
 		    s3AudioList.append(key['Key']) #append the name of the audio file to the list
     
     #render the record page and pass into the page the list of files we found in S3
+>>>>>>> cb909bf5fc3104c08bc0aa50b48e67bf25650d32
     context = {'s3AudioList':s3AudioList}
     return render(request, 'webapp/record.html', context)
     
