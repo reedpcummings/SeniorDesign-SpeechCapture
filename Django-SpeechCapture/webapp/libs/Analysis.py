@@ -21,6 +21,13 @@ comprehend = boto3.client('comprehend',
                             aws_secret_access_key=keys_json['aws_secret_access_key'],
                             region_name='us-west-2'
                             )
+
+s3_client = boto3.client('s3',
+                             aws_access_key_id=keys_json['aws_access_key_id'],
+                             aws_secret_access_key=keys_json['aws_secret_access_key'],
+                             region_name='us-west-2'
+                             )
+
 def GenerateUseCase(content):
     questionDict, answerDict = ExtractAllQuestions(content)
     snowball_stemmer = SnowballStemmer("english")
@@ -122,7 +129,7 @@ def GenerateUseCase(content):
     return total_dict
 
 
-def GetAllAttributesV2(content):
+def GetAllAttributesV2(content, fileName):
     questionDict, answerDict = ExtractAllQuestions(content)
     useCaseDict = GenerateUseCase(content)
     #overallSummary = GenerateSummary(content)
@@ -147,7 +154,13 @@ def GetAllAttributesV2(content):
     totalDict = {"OverallSummary": None,
                  "Questions": totalQuestionDict,
                  "UseCases": useCaseDict}
-    return totalDict
+
+    fileName = fileName.replace(".txt", "Analysis.json")
+    with open(fileName, 'w') as outfile:
+        json.dump(totalDict, outfile)
+
+    s3_client.upload_file(Filename=os.path.join(os.getcwd(), fileName), Bucket='test-speechcapture',
+                          Key=fileName, ExtraArgs={'ACL': 'public-read'})
 
 
 def GetAllAttributes(content, numEntities):

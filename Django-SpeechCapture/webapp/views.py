@@ -226,7 +226,7 @@ def transcript(request, fileName):
 @csrf_exempt
 def record(request):
     s3AudioList = []
-	#s3_client = boto3.client('s3')
+    #s3_client = boto3.client('s3')
 
     key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
     
@@ -241,19 +241,44 @@ def record(request):
                              )
     
     for key in s3_client.list_objects(Bucket='test-speechcapture')['Contents']:
-	    if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav':
-		    print(key['Key'])
-		    s3AudioList.append(key['Key'])
+        if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav':
+            print(key['Key'])
+            s3AudioList.append(key['Key'])
     context = {'s3AudioList':s3AudioList}
     return render(request, 'webapp/record.html', context)
     #return render(request, 'webapp/record.html')
 
 @csrf_exempt
-def analysis(request):
-    f = open("webapp/libs/testinterview.txt", 'r')
-    content = f.read()
-    entityDict = Analysis.GetAllAttributesV2(content)
-    return render(request, 'webapp/analysis.html', {'data': entityDict})
+def analysis(request, fileName):
+    key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
+
+    keys = key_file.read()
+    key_file.close()
+    keys_json = json.loads(keys)
+
+    s3_client = boto3.client('s3',
+                             aws_access_key_id=keys_json['aws_access_key_id'],
+                             aws_secret_access_key=keys_json['aws_secret_access_key'],
+                             region_name='us-west-2'
+                             )
+    job_name = re.sub('\.json$', '', fileName)
+    result = {}
+    # If the file already exists in the bucket
+    if s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json')):
+        result = s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json'))
+        return render(request, 'webapp/analysis.html', {'data': result})
+    else:
+        result = s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + '.txt'))
+        Analysis.GetAllAttributesV2(result, job_name)
+        # wait for the file to be uploaded to the bucket
+        while True:
+            if s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json')):
+                result = s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json'))
+                break
+            print("Not ready yet...")
+            time.sleep(5)
+
+    return render(request, 'webapp/analysis.html', {'data': result})
 
 def history(request):
     request.user = get_user(request)
