@@ -30,6 +30,8 @@ html,body{
 .ajaxProgress {
   display: none;
   text-align: center;
-
 }
 
+.btn-info{
+  color: white;
+}

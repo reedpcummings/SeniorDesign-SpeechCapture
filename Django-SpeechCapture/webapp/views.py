@@ -237,7 +237,7 @@ def record(request):
 def analysis(request):
     f = open("webapp/libs/testinterview.txt", 'r')
     content = f.read()
-    entityDict = Analysis.GetAllAttributes(content, 10)
+    entityDict = Analysis.GetAllAttributesV2(content)
     return render(request, 'webapp/analysis.html', {'data': entityDict})
 
 def history(request):

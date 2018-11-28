@@ -9,9 +9,21 @@ stepOnePath = "webapp/libs/step1.json"
 stepTwoPath = "webapp/libs/step2.json"
 stepThreePath = "webapp/libs/step3.json"
 
+
 def GenerateUseCase(content):
     questionDict, answerDict = ExtractAllQuestions(content)
     snowball_stemmer = SnowballStemmer("english")
+
+    # Default values for use cases
+    name = "Generated Use Case"
+    id = "UC - 1"
+    actors = "No Actors found."
+    preconditions = "No Preconditions found."
+    postconditions = "No Post-conditions found."
+    normalFlow = "No Normal Flow found."
+    altFlow = "No Alternative Flow found."
+
+    # Index placements in the content
     nameIndex = -1
     idIndex = -1
     actorIndex = -1
@@ -19,6 +31,10 @@ def GenerateUseCase(content):
     postconditionIndex = -1
     normalFlowIndex = -1
     alternativeFlowIndex = -1
+
+    total_dict = {}
+    dict_num = 0
+
     for key, value in questionDict.items():
         for sent in value:
             wpFound = False
@@ -43,7 +59,19 @@ def GenerateUseCase(content):
                 if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("name"):
                     nameIndex = key
                 if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("id"):
-                    idIndex = key
+                    if idIndex == -1:
+                        idIndex = key
+                    else:
+                        usecase_dict = {"Name": name,
+                                        "ID": id,
+                                        "Description": None,
+                                        "Preconditions": preconditions,
+                                        "Postconditions": postconditions,
+                                        "Actors": actors,
+                                        "NormalFlow": normalFlow,
+                                        "AlternativeFlow": altFlow}
+                        total_dict[dict_num] = usecase_dict
+                        dict_num += 1
                 if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("precondition"):
                     precondtionIndex = key
                 if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("post"):
@@ -61,40 +89,54 @@ def GenerateUseCase(content):
                 alternativeFlowFound = False
                 normalFlowFound = False
 
-    name = "Generated Use Case"
-    id = "UC - 1"
-    actors = "No Actors found."
-    preconditions = "No Preconditions found."
-    postconditions = "No Postconditions found."
-    normalFlow = "No Normal Flow found."
-    altFlow = "No Alternative Flow found."
-    if nameIndex != -1:
-        name = ' '.join(answerDict[nameIndex])
-    if idIndex != -1:
-        id = ' '.join(answerDict[idIndex])
-    if actorIndex != -1:
-        actors = ' '.join(answerDict[actorIndex])
-    if precondtionIndex != -1:
-        preconditions = ' '.join(answerDict[precondtionIndex])
-    if postconditionIndex != -1:
-        postconditions = ' '.join(answerDict[postconditionIndex])
-    if normalFlowIndex != -1:
-        normalFlow = ' '.join(answerDict[normalFlowIndex])
-    if alternativeFlowIndex != -1:
-        altFlow = ' '.join(answerDict[alternativeFlowIndex])
+        if nameIndex != -1:
+            name = ' '.join(answerDict[nameIndex])
+        if idIndex != -1:
+            id = ' '.join(answerDict[idIndex])
+        if actorIndex != -1:
+            actors = ' '.join(answerDict[actorIndex])
+        if precondtionIndex != -1:
+            preconditions = ' '.join(answerDict[precondtionIndex])
+        if postconditionIndex != -1:
+            postconditions = ' '.join(answerDict[postconditionIndex])
+        if normalFlowIndex != -1:
+            normalFlow = ' '.join(answerDict[normalFlowIndex])
+        if alternativeFlowIndex != -1:
+            altFlow = ' '.join(answerDict[alternativeFlowIndex])
+        if precondtionIndex != -1:
+            preconditions = ' '.join(answerDict[precondtionIndex])
+        if alternativeFlowIndex != -1:
+            altFlow = ' '.join(answerDict[alternativeFlowIndex])
 
-    preconditions = ' '.join(answerDict[precondtionIndex])
-    altFlow = ' '.join(answerDict[alternativeFlowIndex])
+    return total_dict
 
-    usecase_dict = {"Name": name,
-                    "ID": id,
-                    "Description": None,
-                    "Preconditions": preconditions,
-                    "Postconditions": postconditions,
-                    "Actors": actors,
-                    "Normal Flow": normalFlow,
-                    "Alternative Flow": altFlow}
-    return usecase_dict
+
+def GetAllAttributesV2(content):
+    questionDict, answerDict = ExtractAllQuestions(content)
+    useCaseDict = GenerateUseCase(content)
+    #overallSummary = GenerateSummary(content)
+
+    totalQuestionDict = {}
+    index = 0
+    for key, value in questionDict.items():
+        joinedList = questionDict[key] + answerDict[key]
+        joinedString = ' '.join(joinedList)
+        summary, keyWords = GenerateSummary(joinedList)
+        entities = ExtractEntities(joinedString, 5)
+        sentiment = ExtractSentiments(joinedList)
+        qaDict = {"Index": index,
+                  "Question": ' '.join(questionDict[key]),
+                  "Answer": ' '.join(answerDict[key]),
+                  "Summary": summary,
+                  "Entities": entities,
+                  "Keywords": keyWords,
+                  "Sentiment": sentiment}
+        totalQuestionDict[key] = qaDict
+        index += 1
+    totalDict = {"OverallSummary": None,
+                 "Questions": totalQuestionDict,
+                 "UseCases": useCaseDict}
+    return totalDict
 
 
 def GetAllAttributes(content, numEntities):
@@ -123,26 +165,28 @@ def GetAllAttributes(content, numEntities):
         index += 1
     return totalDict
 
+
 # Given an entity, perform ExtractSentences and then find the average sentiment of
 # all of the sentences involved. Returns a dict with the keys of positive, neutral,
 # negative and mixed and the values of their corresponding weight in the sentences ranging
 # from 0.0 to 1.0
-def ExtractSentiments(entity, content):
-    sents = ExtractSentences(entity, content)
+def ExtractSentiments(content, entity=None):
+    if entity is not None:
+        content = ExtractSentences(entity, content)
     comprehend = boto3.client(service_name='comprehend', region_name='us-west-2')
-    entitySentiment = {"positive": 0.0, "negative": 0.0, "mixed": 0.0, "neutral": 0.0}
-    sents = ' '.join(sents)
-    if sents.__len__() > 4500:
-        sents = __SplitString(sents, 4500)
+    sentiment = {"positive": 0.0, "negative": 0.0, "mixed": 0.0, "neutral": 0.0}
+    content = ' '.join(content)
+    if content.__len__() > 4500:
+        content = __SplitString(content, 4500)
     else:
-        sents = [sents]
-    for s in sents:
+        content = [content]
+    for s in content:
         sentFile = comprehend.detect_sentiment(Text=s, LanguageCode='en')
-        entitySentiment["positive"] += round(sentFile["SentimentScore"]["Positive"], 4)
-        entitySentiment["negative"] += round(sentFile["SentimentScore"]["Negative"], 4)
-        entitySentiment["mixed"] += round(sentFile["SentimentScore"]["Mixed"], 4)
-        entitySentiment["neutral"] += round(sentFile["SentimentScore"]["Neutral"], 4)
-    return entitySentiment
+        sentiment["positive"] += round(sentFile["SentimentScore"]["Positive"], 4)
+        sentiment["negative"] += round(sentFile["SentimentScore"]["Negative"], 4)
+        sentiment["mixed"] += round(sentFile["SentimentScore"]["Mixed"], 4)
+        sentiment["neutral"] += round(sentFile["SentimentScore"]["Neutral"], 4)
+    return sentiment
 
 # Extracts all questions and answers in the document, return 2 dicts
 # one for questions, oen for answers
@@ -174,6 +218,19 @@ def ExtractAllQuestions(content):
             if answerFound and re.match(r'^(\w+[:])', vals):
                 questionFound = False
     return questionDict, answerDict
+
+
+def DelineateSentences(content):
+    content = sent_tokenize(content)
+    sentList = []
+    for sent in content:
+        if re.match(r'(^|(?<=[.?!]))\s*[A-Za-z,;:\'\"\s]+\?', sent):
+            sentList.append(sent)
+            sentList.append('\n')
+        else:
+            sentList.append(sent)
+    return sentList
+
 
 def RemoveQuestions(content):
     for vals in content:
