@@ -15,3 +15,5 @@ Django Webapp/mysite/test_audio.wav
 Django-SpeechCapture/webapp/keys.txt
 Django-SpeechCapture/test_audio.wav
 *.wav
+TranscribePrototype.py
+TranscribePrototype_Alternative.py

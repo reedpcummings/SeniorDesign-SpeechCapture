@@ -23,6 +23,34 @@ recordButton.addEventListener("click", startRecording);
 stopButton.addEventListener("click", stopRecording);
 pauseButton.addEventListener("click", pauseRecording);
 
+uploadExistingFileButton.addEventListener("click", uploadExistingFile);
+transcribeButton.addEventListener("click", transcribeFile);
+
+function transcribeFile() {
+    var select = document.getElementById("s3-file-select");
+
+    if (select.selectedIndex == -1 || select.options[select.selectedIndex].text == '--Please choose an option--')
+        return alert("Please select a valid file from the dropdown.");
+    var fName = {'fileName' : select.options[select.selectedIndex].text}
+    alert("Transcribing " + select.options[select.selectedIndex].text)
+	document.getElementById("transcribeLink").href="http://localhost:8000/transcript/" + fname;
+
+	// $.ajax({
+    //     url: 'http://localhost:8000/homepage/transcribe/',
+    //     type: 'POST',
+    //     data: JSON.stringify(fName),
+    //     processData: false,
+    //     contentType: "application/json; charset=utf-8",
+    //     success: function (data) {
+    //         console.log('successfully transcribed' + (data));
+    //     },
+    //     error: function () {
+    //         console.log("you dun messed up")
+    //     }
+    // });
+
+}
+
 navigator.mediaDevices.getUserMedia({ audio: true, video:false }).then(function(stream){visualize(stream);});
 
 
@@ -177,6 +205,49 @@ function createDownloadLink(blob) {
 		  xhr.open("POST","upload.php",true);
 		  xhr.send(fd);
 	})
+
+	upload.addEventListener("click", function(event){
+    
+		// var blob = new File([blob], filename+".mp3 ");
+	
+		// console.log('after conversion')
+		// console.log (blob.size)
+		//AJAX upload BLOB
+	
+		var form = new FormData();
+		// form.append('audio_test', blob, filename + ".wav");
+		form.append('audio_test', blob, downloadName);
+	
+		$.ajax({
+			url: 'http://localhost:8000/homepage/upload/',
+			type: 'POST',
+			data: form,
+			processData: false,
+			contentType: false,
+			success: function (data) {
+				console.log('response' + (data));
+				var dropdown = document.getElementById("s3-file-select");
+	
+				// give the option a random tag (ie, current date)
+				var option = document.createElement('option');
+				option.text = downloadName;
+				dropdown.add(option);
+	
+				for (var i = 0; i < dropdown.options.length; i++) {
+					if (dropdown.options[i].text === downloadName) {
+						dropdown.selectedIndex = i;
+						break;
+					}
+				}
+			},
+			error: function () {
+				console.log("you dun messed up")
+			}
+		});
+	
+	
+	});
+
 	li.appendChild(document.createTextNode (" "))//add a space in between
 	li.appendChild(upload)//add the upload link to li
 

@@ -10,6 +10,9 @@ stepOnePath = "webapp/libs/step1.json"
 stepTwoPath = "webapp/libs/step2.json"
 stepThreePath = "webapp/libs/step3.json"
 
+<<<<<<< HEAD
+
+=======
 key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
     
 keys = key_file.read()
@@ -21,6 +24,7 @@ comprehend = boto3.client('comprehend',
                             aws_secret_access_key=keys_json['aws_secret_access_key'],
                             region_name='us-west-2'
                             )
+>>>>>>> 6822ac40db3a41d01b2510f0e45342e79973afa9
 def GenerateUseCase(content):
     questionDict, answerDict = ExtractAllQuestions(content)
     snowball_stemmer = SnowballStemmer("english")
@@ -181,13 +185,24 @@ def GetAllAttributes(content, numEntities):
 # all of the sentences involved. Returns a dict with the keys of positive, neutral,
 # negative and mixed and the values of their corresponding weight in the sentences ranging
 # from 0.0 to 1.0
+<<<<<<< HEAD
 def ExtractSentiments(content, entity=None):
     if entity is not None:
         content = ExtractSentences(entity, content)
+    comprehend = boto3.client(service_name='comprehend', region_name='us-west-2')
     sentiment = {"positive": 0.0, "negative": 0.0, "mixed": 0.0, "neutral": 0.0}
     content = ' '.join(content)
     if content.__len__() > 4500:
         content = __SplitString(content, 4500)
+=======
+def ExtractSentiments(entity, content):
+    sents = ExtractSentences(entity, content)
+    #comprehend = boto3.client(service_name='comprehend', region_name='us-west-2')
+    entitySentiment = {"positive": 0.0, "negative": 0.0, "mixed": 0.0, "neutral": 0.0}
+    sents = ' '.join(sents)
+    if sents.__len__() > 4500:
+        sents = __SplitString(sents, 4500)
+>>>>>>> 6822ac40db3a41d01b2510f0e45342e79973afa9
     else:
         content = [content]
     for s in content:
