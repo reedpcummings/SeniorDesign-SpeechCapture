@@ -194,29 +194,35 @@ def transcript(request, fileName):
 
 @csrf_exempt
 def record(request):
-    s3AudioList = []
-	#s3_client = boto3.client('s3')
+    s3AudioList = [] #will be the list of files that are stored in S3, will be in the dropdown on the record page
 
+    #open the file that contains the AWS access keys
     key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
     
+    #read the contents of the AWS keys file then close it
     keys = key_file.read()
     key_file.close()
+    
+    #load the keys to to json so each key can be accessed easier
     keys_json = json.loads(keys)
-
+    
+    #connect to AWS S3 using boto3 and the AWS keys loaded from the file
     s3_client = boto3.client('s3',
                              aws_access_key_id=keys_json['aws_access_key_id'],
                              aws_secret_access_key=keys_json['aws_secret_access_key'],
                              region_name='us-west-2'
                              )
     
+    #iterate through files in S3
     for key in s3_client.list_objects(Bucket='test-speechcapture')['Contents']:
-	    if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav':
-		    print(key['Key'])
-		    s3AudioList.append(key['Key'])
+	    if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
+		    print(key['Key']) #log(print) the file name
+		    s3AudioList.append(key['Key']) #append the name of the audio file to the list
+    
+    #render the record page and pass into the page the list of files we found in S3
     context = {'s3AudioList':s3AudioList}
     return render(request, 'webapp/record.html', context)
-    #return render(request, 'webapp/record.html')
-
+    
 @csrf_exempt
 def analysis(request):
     f = open("webapp/libs/testinterview.txt", 'r')
