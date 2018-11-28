@@ -25,7 +25,7 @@ pauseButton.addEventListener("click", pauseRecording);
 
 uploadExistingFileButton.addEventListener("click", uploadExistingFile);
 transcribeButton.addEventListener("click", transcribeFile);
-stopButton.addEventListener("click", transcribeFile);
+//stopButton.addEventListener("click", transcribeFile);
 
 function transcribeFile() {
     var select = document.getElementById("s3-file-select");
@@ -205,6 +205,7 @@ function stopRecording() {
     rec.exportWAV(createDownloadLink);
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
+
 	//rec.exportWAV(upload);
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////
