@@ -1,10 +1,8 @@
 #import pytextrank
 import sys, json, boto3, awscli, re
 from nltk import word_tokenize, sent_tokenize, pos_tag
-from nltk.corpus import stopwords
 import os
 from nltk.stem import SnowballStemmer
-stopWords = set(stopwords.words('english'))
 
 stepOnePath = "webapp/libs/step1.json"
 stepTwoPath = "webapp/libs/step2.json"
@@ -161,33 +159,6 @@ def GetAllAttributesV2(content, fileName):
 
     s3_client.upload_file(Filename=os.path.join(os.getcwd(), fileName), Bucket='test-speechcapture',
                           Key=fileName, ExtraArgs={'ACL': 'public-read'})
-
-
-def GetAllAttributes(content, numEntities):
-    entityDict = {}
-    totalDict = {}
-    entityDict = ExtractEntities(content, numEntities)
-    questionDict, answerDict = ExtractAllQuestions(content)
-    index = 0
-    for key in entityDict.keys():
-        summary, keyWords = GenerateSummary(ExtractSentences(key, content))
-        releventSents = ExtractSentences(key, content)
-        releventSents = ' '.join(releventSents)
-        ent = ExtractEntities(releventSents, 10)
-        entString = ""
-        for relKey in ent.keys():
-            entString += relKey + ", "
-        sentiment = ExtractSentiments(key, content)
-        quest = ExtractRelevantQuestions(questionDict, answerDict, key)
-        properyDict = {"Index": index,
-                       "Summary": summary,
-                       "Questions": quest,
-                       "Keywords": keyWords,
-                       "Entities": entString,
-                       "Sentiment": sentiment}
-        totalDict[key] = properyDict
-        index += 1
-    return totalDict
 
 
 # Given an entity, perform ExtractSentences and then find the average sentiment of
