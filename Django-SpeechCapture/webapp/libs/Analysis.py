@@ -1,4 +1,4 @@
-import pytextrank
+#import pytextrank
 import sys, json, boto3, awscli, re
 from nltk import word_tokenize, sent_tokenize, pos_tag
 from nltk.corpus import stopwords
@@ -139,15 +139,15 @@ def GetAllAttributesV2(content, fileName):
     for key, value in questionDict.items():
         joinedList = questionDict[key] + answerDict[key]
         joinedString = ' '.join(joinedList)
-        summary, keyWords = GenerateSummary(joinedList)
+        #summary, keyWords = GenerateSummary(joinedList)
         entities = ExtractEntities(joinedString, 5)
         sentiment = ExtractSentiments(joinedList)
         qaDict = {"Index": index,
                   "Question": ' '.join(questionDict[key]),
                   "Answer": ' '.join(answerDict[key]),
-                  "Summary": summary,
+                  "Summary": None,
                   "Entities": entities,
-                  "Keywords": keyWords,
+                  "Keywords": None,
                   "Sentiment": sentiment}
         totalQuestionDict[key] = qaDict
         index += 1
@@ -332,47 +332,47 @@ def __SplitString(s, count):
 # Public method for extracting the summary of a given text
 # INPUT: A bunch of text
 # OUTPU: A dictionary containing the summary and keywords
-def GenerateSummary(docInput):
-    docInput = RemoveQuestions(docInput)
-    __StepOne(docInput)
-    __StepTwo()
-    __StepThree()
-    return __StepFour()
-
-# Steps for generating the summary of provided text
-def __StepOne(docInput):
-    docInput = ' '.join(docInput)
-    jsonData = {"id": 0, "text": docInput}
-    with open('webapp/libs/summaryData.json', 'w') as outFile:
-        json.dump(jsonData, outFile)
-    with open(stepOnePath, 'w') as f:
-        for graf in pytextrank.parse_doc(pytextrank.json_iter("webapp/libs/summaryData.json")):
-            f.write("%s\n" % pytextrank.pretty_print(graf._asdict()))
-
-def __StepTwo():
-    graph, ranks = pytextrank.text_rank(stepOnePath)
-    pytextrank.render_ranks(graph, ranks)
-
-    with open(stepTwoPath, 'w') as f:
-        for r1 in pytextrank.normalize_key_phrases(stepOnePath, ranks):
-            f.write("%s\n" % pytextrank.pretty_print(r1._asdict()))
-
-def __StepThree():
-    kernel = pytextrank.rank_kernel(stepTwoPath)
-
-    with open(stepThreePath, 'w') as f:
-        for s in pytextrank.top_sentences(kernel, stepOnePath):
-            f.write(pytextrank.pretty_print(s._asdict()))
-            f.write("\n")
-
-def __StepFour():
-    phrases = ", ".join(set([p for p in pytextrank.limit_keyphrases(stepTwoPath, phrase_limit=12)]))
-    sent_iter = sorted(pytextrank.limit_sentences(stepThreePath, word_limit=150), key=lambda x: x[1])
-    s = []
-
-    for sent_text, idx in sent_iter:
-        s.append(pytextrank.make_sentence(sent_text))
-
-    graf_text = " ".join(s)
-    summaryDict = {"summary": graf_text, "keywords": phrases}
-    return graf_text, phrases
+# def GenerateSummary(docInput):
+#     docInput = RemoveQuestions(docInput)
+#     __StepOne(docInput)
+#     __StepTwo()
+#     __StepThree()
+#     return __StepFour()
+#
+# # Steps for generating the summary of provided text
+# def __StepOne(docInput):
+#     docInput = ' '.join(docInput)
+#     jsonData = {"id": 0, "text": docInput}
+#     with open('webapp/libs/summaryData.json', 'w') as outFile:
+#         json.dump(jsonData, outFile)
+#     with open(stepOnePath, 'w') as f:
+#         for graf in pytextrank.parse_doc(pytextrank.json_iter("webapp/libs/summaryData.json")):
+#             f.write("%s\n" % pytextrank.pretty_print(graf._asdict()))
+#
+# def __StepTwo():
+#     graph, ranks = pytextrank.text_rank(stepOnePath)
+#     pytextrank.render_ranks(graph, ranks)
+#
+#     with open(stepTwoPath, 'w') as f:
+#         for r1 in pytextrank.normalize_key_phrases(stepOnePath, ranks):
+#             f.write("%s\n" % pytextrank.pretty_print(r1._asdict()))
+#
+# def __StepThree():
+#     kernel = pytextrank.rank_kernel(stepTwoPath)
+#
+#     with open(stepThreePath, 'w') as f:
+#         for s in pytextrank.top_sentences(kernel, stepOnePath):
+#             f.write(pytextrank.pretty_print(s._asdict()))
+#             f.write("\n")
+#
+# def __StepFour():
+#     phrases = ", ".join(set([p for p in pytextrank.limit_keyphrases(stepTwoPath, phrase_limit=12)]))
+#     sent_iter = sorted(pytextrank.limit_sentences(stepThreePath, word_limit=150), key=lambda x: x[1])
+#     s = []
+#
+#     for sent_text, idx in sent_iter:
+#         s.append(pytextrank.make_sentence(sent_text))
+#
+#     graf_text = " ".join(s)
+#     summaryDict = {"summary": graf_text, "keywords": phrases}
+#     return graf_text, phrases
