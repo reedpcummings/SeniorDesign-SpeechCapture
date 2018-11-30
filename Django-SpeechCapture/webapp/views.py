@@ -223,8 +223,13 @@ def record(request):
     context = {'s3AudioList':s3AudioList}
     return render(request, 'webapp/record.html', context)
     
+def analysis_default(request):
+    result = {}
+    return render(request, 'webapp/analysis.html', {'data': result})
+
 @csrf_exempt
 def analysis(request, fileName):
+    print("why god do you hate me")
     key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
 
     keys = key_file.read()
