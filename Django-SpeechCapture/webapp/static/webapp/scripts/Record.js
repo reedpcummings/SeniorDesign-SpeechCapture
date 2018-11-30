@@ -1,3 +1,8 @@
+var modified = false;
+
+function on() { document.getElementById("overlay").style.display = "block"; }
+function off() { document.getElementById("overlay").style.display = "none"; }
+
 //webkitURL is deprecated but nevertheless
 URL = window.URL || window.webkitURL;
 
@@ -64,7 +69,7 @@ function uploadExistingFile() {
     //AJAX upload BLOB
     var form = new FormData();
     form.append('audio_test', file);
-
+	on();
     $.ajax({
         url: 'http://localhost:8000/upload/',
         type: 'POST',
@@ -72,7 +77,8 @@ function uploadExistingFile() {
         processData: false,
         contentType: false,
         success: function (data) {
-            console.log('response' + (data));
+			off();
+			console.log('response' + (data));
             fName = file.name;
             console.log(fName);
             var dropdown = document.getElementById("s3-file-select");
@@ -100,8 +106,8 @@ navigator.mediaDevices.getUserMedia({ audio: true, video:false }).then(function(
 
 
 function startRecording() {
+	modified = true;
 	console.log("recordButton clicked");
-
 	/*
 		Simple constraints object, for more advanced audio features see
 		https://addpipe.com/blog/audio-constraints-getusermedia/
@@ -263,7 +269,7 @@ function createDownloadLink(blob) {
 	
 
 	upload.addEventListener("click", function(event){
-    
+		
 		// var blob = new File([blob], filename+".mp3 ");
 	
 		// console.log('after conversion')
@@ -271,6 +277,7 @@ function createDownloadLink(blob) {
 		//AJAX upload BLOB
 	
 		var form = new FormData();
+		on();
 		// form.append('audio_test', blob, filename + ".wav");
 		form.append('audio_test', blob);
 	
@@ -281,6 +288,7 @@ function createDownloadLink(blob) {
 			processData: false,
 			contentType: false,
 			success: function (data) {
+				off();
 				console.log('response ' + (data));
 				var dropdown = document.getElementById("s3-file-select");
 	
@@ -295,7 +303,7 @@ function createDownloadLink(blob) {
 						break;
 					}
 				}
-
+				modified = false;
 				//console.log('response' + " " + (data));
             	//document.getElementById("transcribeLink").href="http://localhost:8000/transcript/" + data;
 			},

@@ -15,8 +15,6 @@ function upload(blob) {
         },
         error: function () {
             console.log("you dun messed up")
-        }
+         }
     });
-        
-    
 }

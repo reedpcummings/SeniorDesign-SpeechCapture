@@ -1,6 +1,8 @@
 {% extends "webapp/header.html" %}
 
 {% block record %}
+
+{% load static %}
 	<div class = "container topElement">
 	
 		<div class="row">
@@ -47,8 +49,38 @@
 		<h3>Recordings</h3>
 		<ol id="recordingsList"></ol>
 		
-		<script>
+		<style>
+				#overlay {
+					position: fixed;
+					display: none;
+					width: 100%;
+					height: 100%;
+					top: 0;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					background-color: rgba(0,0,0,0.5);
+					z-index: 2;
+					cursor: pointer;
+				}
+				
+				#text{
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					font-size: 50px;
+					color: white;
+					transform: translate(-50%,-50%);
+					-ms-transform: translate(-50%,-50%);
+				}
+		</style>
 
+		<div id="overlay">
+			<div id="text"></div><img src= "{% static 'webapp/img/ajax-loader.gif' %}"/></div>
+		</div>
+
+		<script>
+			window.onbeforeunload = s => modified ? "" : null;
 		</script>
 
 	</div>
