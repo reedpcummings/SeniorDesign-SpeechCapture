@@ -236,22 +236,27 @@ def analysis(request, fileName):
                              aws_secret_access_key=keys_json['aws_secret_access_key'],
                              region_name='us-west-2'
                              )
-    job_name = re.sub('\.json$', '', fileName)
+    job_name = re.sub('\.txt$', '', fileName)
     result = {}
     # If the file already exists in the bucket
-    if s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json')):
+    try:
+        s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json'))
         result = s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json'))
         return render(request, 'webapp/analysis.html', {'data': result})
-    else:
-        result = s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + '.txt'))
-        Analysis.GetAllAttributesV2(result, job_name)
-        # wait for the file to be uploaded to the bucket
-        while True:
-            if s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json')):
-                result = s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json'))
-                break
-            print("Not ready yet...")
-            time.sleep(5)
+    except:
+        try:
+            result = s3_client.get_object(Bucket='test-speechcapture', Key=(fileName))
+            Analysis.GetAllAttributesV2(result, fileName)
+            # wait for the file to be uploaded to the bucket
+        except:
+            while True:
+                try: 
+                    s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json'))
+                    result = s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json'))
+                    break
+                except:
+                    print("Not ready yet...")
+                    time.sleep(5)
 
     return render(request, 'webapp/analysis.html', {'data': result})
 

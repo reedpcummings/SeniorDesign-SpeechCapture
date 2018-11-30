@@ -1,4 +1,3 @@
-#import pytextrank
 import sys, json, boto3, awscli, re
 from nltk import word_tokenize, sent_tokenize, pos_tag
 import os
