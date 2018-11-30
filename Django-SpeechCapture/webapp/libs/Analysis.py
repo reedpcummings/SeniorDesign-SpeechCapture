@@ -2,6 +2,8 @@ import sys, json, boto3, awscli, re
 from nltk import word_tokenize, sent_tokenize, pos_tag
 import os
 from nltk.stem import SnowballStemmer
+snowball_stemmer = SnowballStemmer("english")
+stop_words = open('stopwords.txt').read().split("\n")
 
 stepOnePath = "webapp/libs/step1.json"
 stepTwoPath = "webapp/libs/step2.json"
@@ -27,7 +29,6 @@ s3_client = boto3.client('s3',
 
 def GenerateUseCase(content):
     questionDict, answerDict = ExtractAllQuestions(content)
-    snowball_stemmer = SnowballStemmer("english")
 
     # Default values for use cases
     name = "Generated Use Case"
@@ -65,10 +66,10 @@ def GenerateUseCase(content):
                 if items[1] == 'WP':
                     wpFound = True
                     continue
-                if items[0] == 'normal':
+                if snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("actors"):
                     normalFlowFound = True
                     continue
-                if items[0] == 'alternative':
+                if snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("actors"):
                     alternativeFlowFound = True
                     continue
                 if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("actors"):
@@ -142,15 +143,15 @@ def GetAllAttributesV2(content, fileName):
     for key, value in questionDict.items():
         joinedList = questionDict[key] + answerDict[key]
         joinedString = ' '.join(joinedList)
-        #summary, keyWords = GenerateSummary(joinedList)
+        summary, keyWords = GenerateSummary(joinedList, 5, 5)
         entities = ExtractEntities(joinedString, 5)
         sentiment = ExtractSentiments(joinedList)
         qaDict = {"Index": index,
                   "Question": ' '.join(questionDict[key]),
                   "Answer": ' '.join(answerDict[key]),
-                  "Summary": None,
+                  "Summary": summary,
                   "Entities": entities,
-                  "Keywords": None,
+                  "Keywords": keyWords,
                   "Sentiment": sentiment}
         totalQuestionDict[key] = qaDict
         index += 1
@@ -198,24 +199,23 @@ def ExtractAllQuestions(content):
     answerFound = False
     for vals in sentToken:
         if re.match(r'(^|(?<=[.?!]))\s*[A-Za-z,;:\'\"\s]+\?', vals):
-            if not questionFound or answerFound:
-                index += 1
-                questionDict[index] = []
-                questionFound = True
-                answerFound = False
+            if questionFound is True and answerFound is False:
+                answerDict[index] = []
+                answerDict[index].append("No answer detected for this question")
             questionDict[index].append(vals)
+            questionFound = True
+            answerFound = False
+            index += 1
             continue
         if questionFound:
-            if answerFound and not re.match(r'^(\w+[:])', vals):
+            if answerFound is True:
                 answerDict[index].append(vals)
                 continue
-            if re.match(r'^(\w+[:])', vals) and not answerFound:
+            elif answerFound is False:
                 answerDict[index] = []
                 answerFound = True
                 answerDict[index].append(vals)
                 continue
-            if answerFound and re.match(r'^(\w+[:])', vals):
-                questionFound = False
     return questionDict, answerDict
 
 
@@ -304,6 +304,51 @@ def __DetectEntities(content):
 # Splits up input strings due to comprehend's limit on input to 5000 characters
 def __SplitString(s, count):
     return [''.join(x) for x in zip(*[list(s[z::count]) for z in range(count)])]
+
+
+def GenerateSummary(content, num_sents, num_keywords):
+    sent_tokens_raw = sent_tokenize(content)
+    sent_tokens_cleaned = []
+    for tokens in sent_tokens_raw:
+        clean_token = re.sub(r'[^a-zA-Z_ ]', "", tokens)
+        clean_token = clean_token.lower()
+        word_tokens = word_tokenize(clean_token)
+        for word in word_tokens:
+            if word not in stop_words:
+                sent_tokens_cleaned.append(word)
+    frequency_dict = {}
+    for words in sent_tokens_cleaned:
+        if words in frequency_dict:
+            frequency_dict[words] += 1
+        else:
+            frequency_dict[words] = 1
+    sorted_values = sorted(frequency_dict.items(), key=lambda kv: kv[1], reverse=True)
+    max_value = sorted_values[0][1]
+    weighted_frequency_dict = {}
+    for key, value in frequency_dict.items():
+        weighted_frequency_dict[key] = value / max_value
+    weighted_sentence_dict = {}
+    for sent in sent_tokens_raw:
+        words = word_tokenize(sent)
+        weighted_val = 0
+        for word in words:
+            if  word in sent_tokens_cleaned:
+                weighted_val += weighted_frequency_dict[word]
+        weighted_sentence_dict[sent] = weighted_val
+    sorted_sents = sorted(weighted_sentence_dict, key=(lambda key: weighted_sentence_dict[key]), reverse=True)
+    summary_list = []
+    index = 0
+    while index < num_sents:
+        summary_list.append(sorted_sents[index])
+        index += 1
+
+    keyword_list = []
+    index = 0
+    while index < num_keywords:
+        keyword_list.append(sorted_values[index][0])
+        index += 1
+
+    return ' '.join(summary_list), ' '.join(keyword_list)
 
 # Public method for extracting the summary of a given text
 # INPUT: A bunch of text
