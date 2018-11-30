@@ -33,6 +33,7 @@ def GenerateUseCase(content):
     # Default values for use cases
     name = "Generated Use Case"
     id = "UC - 1"
+    trigger = "No Triggers found."
     actors = "No Actors found."
     preconditions = "No Preconditions found."
     postconditions = "No Post-conditions found."
@@ -43,6 +44,7 @@ def GenerateUseCase(content):
     nameIndex = -1
     idIndex = -1
     actorIndex = -1
+    triggerIndex = -1
     precondtionIndex = -1
     postconditionIndex = -1
     normalFlowIndex = -1
@@ -70,20 +72,22 @@ def GenerateUseCase(content):
                 if items[0] == 'alternative':
                     alternativeFlowFound = True
                     continue
-                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("actor"):
+                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("actors"):
                     actorIndex = key
                 if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("name"):
                     nameIndex = key
+                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("triggers"):
+                    triggerIndex = key
                 if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("id"):
                     if idIndex == -1:
                         idIndex = key
                     else:
                         usecase_dict = {"Name": name,
                                         "ID": id,
-                                        "Description": None,
+                                        "Trigger": trigger,
+                                        "Actors": actors,
                                         "Preconditions": preconditions,
                                         "Postconditions": postconditions,
-                                        "Actors": actors,
                                         "NormalFlow": normalFlow,
                                         "AlternativeFlow": altFlow}
                         total_dict[dict_num] = usecase_dict
@@ -123,6 +127,8 @@ def GenerateUseCase(content):
             preconditions = ' '.join(answerDict[precondtionIndex])
         if alternativeFlowIndex != -1:
             altFlow = ' '.join(answerDict[alternativeFlowIndex])
+        if triggerIndex != -1:
+            triggerIndex = ' '.join(answerDict[triggerIndex])
 
     return total_dict
 
