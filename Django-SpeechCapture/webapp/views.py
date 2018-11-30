@@ -260,7 +260,7 @@ def analysis(request, fileName):
         except:
             print("Not ready yet...")
             time.sleep(5)
-    result = {}
+    
     return render(request, 'webapp/analysis.html', {'data': result})
 
 def history(request):

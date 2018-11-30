@@ -3,7 +3,7 @@ from nltk import word_tokenize, sent_tokenize, pos_tag
 import os
 from nltk.stem import SnowballStemmer
 snowball_stemmer = SnowballStemmer("english")
-stop_words = open('stopwords.txt').read().split("\n")
+stop_words = open(os.path.join(os.path.curdir, 'webapp', 'stopwords.txt')).read().split("\n")
 
 stepOnePath = "webapp/libs/step1.json"
 stepTwoPath = "webapp/libs/step2.json"
@@ -127,8 +127,8 @@ def GenerateUseCase(content):
             preconditions = ' '.join(answerDict[precondtionIndex])
         if alternativeFlowIndex != -1:
             altFlow = ' '.join(answerDict[alternativeFlowIndex])
-        if triggerIndex != -1:
-            triggerIndex = ' '.join(answerDict[triggerIndex])
+        # if triggerIndex != -1:
+        #     triggerIndex = ' '.join(answerDict[triggerIndex])
 
     return total_dict
 
@@ -136,26 +136,25 @@ def GenerateUseCase(content):
 def GetAllAttributesV2(content, fileName):
     questionDict, answerDict = ExtractAllQuestions(content)
     useCaseDict = GenerateUseCase(content)
-    #overallSummary = GenerateSummary(content)
+    overallSummary, overallKeywords = GenerateSummary(content, 5, 5)
     print(content)
     totalQuestionDict = {}
     index = 0
     for key, value in questionDict.items():
         joinedList = questionDict[key] + answerDict[key]
         joinedString = ' '.join(joinedList)
-        summary, keyWords = GenerateSummary(joinedList, 5, 5)
         entities = ExtractEntities(joinedString, 5)
         sentiment = ExtractSentiments(joinedList)
         qaDict = {"Index": index,
                   "Question": ' '.join(questionDict[key]),
                   "Answer": ' '.join(answerDict[key]),
-                  "Summary": summary,
+                  "Summary": None,
                   "Entities": entities,
-                  "Keywords": keyWords,
+                  "Keywords": None,
                   "Sentiment": sentiment}
         totalQuestionDict[key] = qaDict
         index += 1
-    totalDict = {"OverallSummary": None,
+    totalDict = {"OverallSummary": overallSummary,
                  "Questions": totalQuestionDict,
                  "UseCases": useCaseDict}
 
@@ -199,23 +198,14 @@ def ExtractAllQuestions(content):
     answerFound = False
     for vals in sentToken:
         if re.match(r'(^|(?<=[.?!]))\s*[A-Za-z,;:\'\"\s]+\?', vals):
-            if questionFound is True and answerFound is False:
-                answerDict[index] = []
-                answerDict[index].append("No answer detected for this question")
+            index += 1
+            questionDict[index] = [""]
+            answerDict[index] = [""]
             questionDict[index].append(vals)
             questionFound = True
-            answerFound = False
-            index += 1
             continue
         if questionFound:
-            if answerFound is True:
-                answerDict[index].append(vals)
-                continue
-            elif answerFound is False:
-                answerDict[index] = []
-                answerFound = True
-                answerDict[index].append(vals)
-                continue
+            answerDict[index].append(vals)
     return questionDict, answerDict
 
 
