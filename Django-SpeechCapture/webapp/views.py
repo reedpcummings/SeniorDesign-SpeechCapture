@@ -1,6 +1,5 @@
 import os, time, json, boto3
 import string
-import random
 import datetime
 import re
 from django.http import JsonResponse
@@ -241,28 +240,27 @@ def analysis(request, fileName):
                              aws_secret_access_key=keys_json['aws_secret_access_key'],
                              region_name='us-west-2'
                              )
-    job_name = re.sub('\.txt$', '', fileName)
-    result = {}
+    job_name = fileName.replace(".txt","") #re.sub('\.txt$', '', fileName)
     # If the file already exists in the bucket
-    try:
-        s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json'))
-        result = s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json'))
-        return render(request, 'webapp/analysis.html', {'data': result})
-    except:
-        try:
-            result = s3_client.get_object(Bucket='test-speechcapture', Key=(fileName))
-            Analysis.GetAllAttributesV2(result, fileName)
-            # wait for the file to be uploaded to the bucket
+    key_name = (job_name + 'Analysis' + '.json')
+    # try:
+    #     result = s3_client.get_object(Bucket='test-speechcapture', Key=(key_name))
+    #     return render(request, 'webapp/analysis.html', {'data': result})
+    # #except:
+    #try:    
+    result = s3_client.get_object(Bucket='test-speechcapture', Key=(fileName))
+    text = result["Body"].read().decode()
+    Analysis.GetAllAttributesV2(text, fileName)
+    # wait for the file to be uploaded to the bucket
+    while True:
+        try: 
+            result = s3_client.get_object(Bucket='test-speechcapture', Key=(key_name))
+            print("hello")
+            break
         except:
-            while True:
-                try: 
-                    s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json'))
-                    result = s3_client.get_object(Bucket='test-speechcapture', Key=(job_name + 'Analysis' + '.json'))
-                    break
-                except:
-                    print("Not ready yet...")
-                    time.sleep(5)
-
+            print("Not ready yet...")
+            time.sleep(5)
+    result = {}
     return render(request, 'webapp/analysis.html', {'data': result})
 
 def history(request):

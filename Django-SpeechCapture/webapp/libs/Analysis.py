@@ -137,7 +137,7 @@ def GetAllAttributesV2(content, fileName):
     questionDict, answerDict = ExtractAllQuestions(content)
     useCaseDict = GenerateUseCase(content)
     #overallSummary = GenerateSummary(content)
-
+    print(content)
     totalQuestionDict = {}
     index = 0
     for key, value in questionDict.items():
