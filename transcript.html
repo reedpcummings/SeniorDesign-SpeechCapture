@@ -1,0 +1,142 @@
+{% extends "webapp/header.html" %}
+
+{% block transcript %}
+
+{% load static %}
+
+<script type="text/javascript">
+function transcribeDropdownEvent(value)
+{
+		$(document).ready(function() {
+			$('.ajaxProgress').show();
+			var fileName = value;
+
+	        // var dropdown = document.getElementById("s3-file-select");
+
+	        // for (var i = 0; i < dropdown.options.length; i++) {
+	        //     if (dropdown.options[i].text === fileName) {
+	        //         dropdown.selectedIndex = i;
+	        //         break;
+	        // }
+			$.ajax({
+				type: "GET",
+				url: "http://localhost:8000/transcript_backend/" + fileName,
+				dataType: "html",
+				async: true,
+				success: function(html) {
+					$("#scriptText").html(html);
+					$('.ajaxProgress').hide();
+
+					$("#scriptText").css("white-space", "nowrap")
+					$("#scriptText").css("white-space", "pre-line")
+				}
+			})
+ 		});
+		
+		var fileName = value;
+		var analysisFile = fileName.replace(".wav", ".txt");
+		var transcriptFile = fileName.replace(".wav", ".txt");
+
+
+
+
+		document.getElementById("analysisBtn").href="http://localhost:8000/analysis/" + analysisFile;
+		document.getElementById("saveButton").href="https://s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
+}
+</script>
+
+	<div class = "container topElement">
+		<div class="row">
+			<div class="col text-center">
+				<!-- <button type="button" class="btn btn-secondary">Upload Audio File</button> -->
+				<select id="s3-file-select" onchange="transcribeDropdownEvent(this.value);">
+					<option value="">--Please choose an option--</option>
+					{% if s3AudioList %}
+						{% autoescape off %}
+						{% for audio in s3AudioList %}
+							{% if fileName and fileName == audio%}
+								<option selected ="selected" value={{audio}}>{{audio}}</option>
+							{% else %}
+								<option value={{audio}}>{{audio}}</option>
+							{% endif %}
+						{% endfor %}
+
+						{% endautoescape %}
+					{% endif %}
+				</select>
+			</div>
+			<div class="col text-center">
+				<a href="#" id="saveButton" class="btn btn-secondary" download="transcript.txt">Save Text</a>
+			</div>
+			<div class="col text-center">
+				<a id="analysisBtn" href="#" class="btn btn-secondary">Go to Analysis</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="container scroll">
+		<div class="card">
+			<div class="card-body">
+				<div style="border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;white-space: pre-line;">
+					<p id="scriptText" style="white-space: pre;">
+						<div class="ajaxProgress">
+							<h3>Please Wait...</h3>
+							<img src= "{% static 'webapp/img/ajax-loader.gif' %}"/>
+						</div>
+
+						<!-- {{value}} -->
+						<!-- {{data}} -->
+
+						<!-- {% for key,value in data.items %}
+							<script type="text/javascript"> 
+							   var text = "{{value}}";
+							</script>
+							{{value}}
+						{% endfor %} -->
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('.ajaxProgress').show();
+			var fileName = "{{fileName}}";
+
+	        // var dropdown = document.getElementById("s3-file-select");
+
+	        // for (var i = 0; i < dropdown.options.length; i++) {
+	        //     if (dropdown.options[i].text === fileName) {
+	        //         dropdown.selectedIndex = i;
+	        //         break;
+	        // }
+			$.ajax({
+				type: "GET",
+				url: "http://localhost:8000/transcript_backend/" + fileName,
+				dataType: "html",
+				async: true,
+				success: function(html) {
+					$("#scriptText").html(html);
+					$('.ajaxProgress').hide();
+
+					$("#scriptText").css("white-space", "nowrap")
+					$("#scriptText").css("white-space", "pre-line")
+				}
+			})
+ 		});
+		
+		var fileName = "{{fileName}}";
+		var analysisFile = fileName.replace(".wav", ".txt");
+		var transcriptFile = fileName.replace(".wav", ".txt");
+
+
+
+
+		document.getElementById("analysisBtn").href="http://localhost:8000/analysis/" + analysisFile;
+		document.getElementById("saveButton").href="https://s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
+		 
+	
+	</script>
+
+{% endblock %}
