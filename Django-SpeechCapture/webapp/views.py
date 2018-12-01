@@ -259,7 +259,8 @@ def analysis(request, fileName):
         except:
             print("Not ready yet...")
             time.sleep(5)
-    result = json.loads(result)
+    text = result["Body"].read().decode()
+    result = json.loads(text)
     return render(request, 'webapp/analysis.html', {'data': result})
 
 def history(request):
