@@ -129,7 +129,7 @@ def GenerateUseCase(content):
             altFlow = ' '.join(answerDict[alternativeFlowIndex])
         # if triggerIndex != -1:
         #     triggerIndex = ' '.join(answerDict[triggerIndex])
-
+    total_dict[dict_num] = usecase_dict
     return total_dict
 
 
