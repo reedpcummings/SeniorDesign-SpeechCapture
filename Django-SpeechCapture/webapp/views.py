@@ -255,12 +255,11 @@ def analysis(request, fileName):
     while True:
         try: 
             result = s3_client.get_object(Bucket='test-speechcapture', Key=(key_name))
-            print("hello")
             break
         except:
             print("Not ready yet...")
             time.sleep(5)
-    
+    result = json.loads(result)
     return render(request, 'webapp/analysis.html', {'data': result})
 
 def history(request):
