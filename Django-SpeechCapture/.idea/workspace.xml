@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="79eac67e-6e2b-4a9c-8f8c-dcc3d9666023" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/webapp/libs/Analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/webapp/libs/Analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webapp/templates/webapp/analysis.html" beforeDir="false" afterPath="$PROJECT_DIR$/webapp/templates/webapp/analysis.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -48,7 +48,7 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="162" />
-          <entry key="html" value="856" />
+          <entry key="html" value="871" />
           <entry key="jsonplaceholder" value="1" />
           <entry key="py" value="4513" />
           <entry key="testinterview" value="14" />
@@ -57,7 +57,7 @@
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="HTML" value="856" />
+          <entry key="HTML" value="871" />
           <entry key="JSON" value="1" />
           <entry key="PLAIN_TEXT" value="42" />
           <entry key="Python" value="4675" />
@@ -67,11 +67,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/webapp/libs/Analysis.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="485">
-              <caret line="135" column="51" lean-forward="true" selection-start-line="135" selection-start-column="51" selection-end-line="135" selection-end-column="51" />
+            <state relative-caret-position="1116">
+              <caret line="139" column="14" selection-start-line="139" selection-start-column="4" selection-end-line="139" selection-end-column="14" />
               <folding>
                 <element signature="e#19#54#0" expanded="true" />
                 <marker date="1543639894988" expanded="true" signature="12418:14002" ph="..." />
@@ -89,11 +89,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/webapp/templates/webapp/analysis.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-98">
-              <caret line="5" column="48" selection-start-line="5" selection-start-column="48" selection-end-line="5" selection-end-column="48" />
+            <state relative-caret-position="336">
+              <caret line="70" column="44" lean-forward="true" selection-start-line="70" selection-start-column="44" selection-end-line="70" selection-end-column="44" />
             </state>
           </provider>
         </entry>
@@ -140,13 +140,13 @@
         <option value="$PROJECT_DIR$/webapp/templates/webapp/header.html" />
         <option value="$PROJECT_DIR$/webapp/libs/jsonplaceholder" />
         <option value="$USER_HOME$/AppData/Local/Programs/Python/Python36-32/Lib/site-packages/pytextrank/pytextrank.py" />
-        <option value="$PROJECT_DIR$/webapp/templates/webapp/analysis.html" />
         <option value="$PROJECT_DIR$/webapp/views.py" />
         <option value="$PROJECT_DIR$/webapp/libs/Analysis.py" />
+        <option value="$PROJECT_DIR$/webapp/templates/webapp/analysis.html" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="width" value="960" />
     <option name="height" value="1040" />
   </component>
@@ -267,7 +267,7 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12434141" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12592202" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -383,6 +383,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/webapp/libs/Analysis.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1116">
+          <caret line="139" column="14" selection-start-line="139" selection-start-column="4" selection-end-line="139" selection-end-column="14" />
+          <folding>
+            <element signature="e#19#54#0" expanded="true" />
+            <marker date="1543639894988" expanded="true" signature="12418:14002" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/webapp/static/webapp/scripts/downloadFile.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="408">
@@ -392,19 +403,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/webapp/templates/webapp/analysis.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-98">
-          <caret line="5" column="48" selection-start-line="5" selection-start-column="48" selection-end-line="5" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/webapp/libs/Analysis.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="485">
-          <caret line="135" column="51" lean-forward="true" selection-start-line="135" selection-start-column="51" selection-end-line="135" selection-end-column="51" />
-          <folding>
-            <element signature="e#19#54#0" expanded="true" />
-            <marker date="1543639894988" expanded="true" signature="12418:14002" ph="..." />
-          </folding>
+        <state relative-caret-position="336">
+          <caret line="70" column="44" lean-forward="true" selection-start-line="70" selection-start-column="44" selection-end-line="70" selection-end-column="44" />
         </state>
       </provider>
     </entry>

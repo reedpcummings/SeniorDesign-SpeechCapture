@@ -65,12 +65,12 @@
     <div class="card" id="useCaseCont">
         <div class="container scroll">
             <div class="card-body">
-                {% for key2,value2 in value.UseCases %}
+                {% for key2,value2 in value.UseCases.items %}
                     <b>Name:</b> {{value2.Name}}
                     <br/>
                     <b>ID:</b> {{value2.ID}}
                     <br/>
-                    <b>Description:</b> {{value2.Description}}
+                    <b>Description:</b> {{value2.Trigger}}
                     <br/>
                     <b>Preconditions:</b> {{value2.Preconditions}}
                     <br/>
