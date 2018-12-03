@@ -1,3 +1,10 @@
+var modified = false;
+
+window.onbeforeunload = s => modified ? "" : null;
+
+function on() { document.getElementById("overlay").style.display = "block"; }
+function off() { document.getElementById("overlay").style.display = "none"; }
+
 //webkitURL is deprecated but nevertheless
 URL = window.URL || window.webkitURL;
 
@@ -23,12 +30,94 @@ recordButton.addEventListener("click", startRecording);
 stopButton.addEventListener("click", stopRecording);
 pauseButton.addEventListener("click", pauseRecording);
 
+uploadExistingFileButton.addEventListener("click", uploadExistingFile);
+transcribeButton.addEventListener("click", transcribeFile);
+//stopButton.addEventListener("click", transcribeFile);
+
+function transcribeFile() {
+    var select = document.getElementById("s3-file-select");
+
+    if (select.selectedIndex == -1 || select.options[select.selectedIndex].text == '--Please choose an option--')
+        return alert("Please select a valid file from the dropdown.");
+    var fName = {'fileName' : select.options[select.selectedIndex].text}
+    //alert("Transcribing " + select.options[select.selectedIndex].text)
+	location.href = "http://localhost:8000/transcript/" + select.options[select.selectedIndex].text;
+	//document.getElementById("transcribeLink").href="http://localhost:8000/transcript/" + select.options[select.selectedIndex].text;
+
+	// $.ajax({
+    //     url: 'http://localhost:8000/homepage/transcribe/',
+    //     type: 'POST',
+    //     data: JSON.stringify(fName),
+    //     processData: false,
+    //     contentType: "application/json; charset=utf-8",
+    //     success: function (data) {
+    //         console.log('successfully transcribed' + (data));
+    //     },
+    //     error: function () {
+    //         console.log("you dun messed up")
+    //     }
+    // });
+
+}
+
+function uploadExistingFile() {
+
+    var files = document.getElementById('file').files;
+    if (!files.length) {
+        return alert('Please choose a file to upload first.');
+    }
+    var file = files[0];
+
+    //AJAX upload BLOB
+    var form = new FormData();
+    form.append('audio_test', file);
+	on();
+    $.ajax({
+		url: 'http://localhost:8000/upload/',
+        //url: 'http:local/upload/',
+        type: 'POST',
+        data: form,
+        processData: false,
+		contentType: false,
+		crossDomain:true,
+		headers: {
+			'Access-Control-Allow-Origin': '*'
+		},
+		xhrFields: {
+			withCredentials: false
+		  },
+        success: function (data) {
+			off();
+			console.log('response' + (data));
+            fName = file.name;
+            console.log(fName);
+            var dropdown = document.getElementById("s3-file-select");
+
+            // give the option a random tag (ie, current date)
+            var option = document.createElement('option');
+            option.text = data;
+            dropdown.add(option);
+
+            for (var i = 0; i < dropdown.options.length; i++) {
+                if (dropdown.options[i].text === data) {
+                    dropdown.selectedIndex = i;
+                    break;
+                }
+			}
+			//document.getElementById("transcribeLink").href="http://localhost:8000/transcript/" + data;
+        },
+        error: function () {
+            console.log("you dun messed up")
+        }
+    });
+}
+
 navigator.mediaDevices.getUserMedia({ audio: true, video:false }).then(function(stream){visualize(stream);});
 
 
 function startRecording() {
+	modified = true;
 	console.log("recordButton clicked");
-
 	/*
 		Simple constraints object, for more advanced audio features see
 		https://addpipe.com/blog/audio-constraints-getusermedia/
@@ -130,7 +219,12 @@ function stopRecording() {
 
 	//create the wav blob and pass it on to createDownloadLink
     rec.exportWAV(createDownloadLink);
-    rec.exportWAV(upload);
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//rec.exportWAV(upload);
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 function createDownloadLink(blob) {
@@ -158,6 +252,11 @@ function createDownloadLink(blob) {
 	//add the filename to the li
 	li.appendChild(document.createTextNode(filename+".wav "))
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//document.getElementById("transcribeLink").href="localhost:8000/transcript/" + filename + ".wav"; 
+	//$('#transcribeLink').attr('href',"http://localhost:8000/transcript/" + filename + ".wav");
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	//add the save to disk link to li
 	li.appendChild(link);
 	
@@ -165,18 +264,69 @@ function createDownloadLink(blob) {
 	var upload = document.createElement('a');
 	upload.href="#";
 	upload.innerHTML = "Upload";
+	// upload.addEventListener("click", function(event){
+	// 	  var xhr=new XMLHttpRequest();
+	// 	  xhr.onload=function(e) {
+	// 	      if(this.readyState === 4) {
+	// 	          console.log("Server returned: ",e.target.responseText);
+	// 	      }
+	// 	  };
+	// 	  var fd=new FormData();
+	// 	  fd.append("audio_data",blob, filename);
+	// 	  xhr.open("POST","upload.php",true);
+	// 	  xhr.send(fd);
+	// })
+	
+
 	upload.addEventListener("click", function(event){
-		  var xhr=new XMLHttpRequest();
-		  xhr.onload=function(e) {
-		      if(this.readyState === 4) {
-		          console.log("Server returned: ",e.target.responseText);
-		      }
-		  };
-		  var fd=new FormData();
-		  fd.append("audio_data",blob, filename);
-		  xhr.open("POST","upload.php",true);
-		  xhr.send(fd);
-	})
+		
+		// var blob = new File([blob], filename+".mp3 ");
+	
+		// console.log('after conversion')
+		// console.log (blob.size)
+		//AJAX upload BLOB
+	
+		var form = new FormData();
+		on();
+		// form.append('audio_test', blob, filename + ".wav");
+		form.append('audio_test', blob);
+	
+		$.ajax({
+			//url: 'http://django-env.krxijs76pr.us-west-2.elasticbeanstalk.com/upload/',
+			url: 'http://localhost:8000/upload/',
+			type: 'POST',
+			data: form,
+			processData: false,
+			contentType: false,
+			crossDomain:true,
+			success: function (data) {
+				off();
+				console.log('response ' + (data));
+				var dropdown = document.getElementById("s3-file-select");
+	
+				// give the option a random tag (ie, current date)
+				var option = document.createElement('option');
+				option.text = data;
+				dropdown.add(option);
+	
+				for (var i = 0; i < dropdown.options.length; i++) {
+					if (dropdown.options[i].text === data) {
+						dropdown.selectedIndex = i;
+						break;
+					}
+				}
+				modified = false;
+				//console.log('response' + " " + (data));
+            	//document.getElementById("transcribeLink").href="http://localhost:8000/transcript/" + data;
+			},
+			error: function () {
+				console.log("you dun messed up")
+			}
+		});
+	
+	
+	});
+
 	li.appendChild(document.createTextNode (" "))//add a space in between
 	li.appendChild(upload)//add the upload link to li
 

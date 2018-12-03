@@ -1,5 +1,7 @@
 var modified = false;
 
+window.onbeforeunload = s => modified ? "" : null;
+
 function on() { document.getElementById("overlay").style.display = "block"; }
 function off() { document.getElementById("overlay").style.display = "none"; }
 

@@ -42,6 +42,7 @@
 				url: "http://localhost:8000/transcript_backend/" + fileName,
 				dataType: "html",
 				async: true,
+				crossDomain:true,
 				success: function(html) {
 					$("#scriptText").html(html);
 					$('.ajaxProgress').hide();

@@ -26,3 +26,12 @@ html,body{
 .card {
   height: 100%;
 }
+
+.ajaxProgress {
+  display: none;
+  text-align: center;
+}
+
+.btn-info{
+  color: white;
+}

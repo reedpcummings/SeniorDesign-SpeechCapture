@@ -11,7 +11,7 @@ function upload(blob) {
         contentType: false,
         success: function (data) {
             console.log('response' + " " + (data));
-            document.getElementById("transcribeLink").href="http://localhost:8000/transcript/" + data; //$('#transcribeLink').attr('href',"http://localhost:8000/transcript/" + data);
+            document.getElementById("transcribeLink").href="http://http://django-env.krxijs76pr.us-west-2.elasticbeanstalk.com/transcript/" + data; //$('#transcribeLink').attr('href',"http://localhost:8000/transcript/" + data);
         },
         error: function () {
             console.log("you dun messed up")
