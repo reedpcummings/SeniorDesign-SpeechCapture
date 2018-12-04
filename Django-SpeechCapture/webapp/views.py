@@ -16,14 +16,48 @@ from .libs import Analysis
 
 from django.http import HttpResponse
 
+bucket = 'test-speechcapture'
+
 def index(request):
     directory_old = os.listdir(os.path.join(os.getcwd(), "webapp", "static"))
     directory_new = os.listdir(os.path.join(os.getcwd(), "webapp", "static", "webapp"))
     return render(request, 'webapp/home.html')
 
 def transcript_default(request):
-    content = ""
-    return render(request, 'webapp/transcript.html', {'data': content})
+    # content = ""
+    s3AudioList = [] #will be the list of files that are stored in S3, will be in the dropdown on the record page
+
+    #open the file that contains the AWS access keys
+    key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
+    
+    #read the contents of the AWS keys file then close it
+    keys = key_file.read()
+    key_file.close()
+    
+    #load the keys to to json so each key can be accessed easier
+    keys_json = json.loads(keys)
+
+    #connect to AWS S3 using boto3 and the AWS keys loaded from the file
+    s3_client = boto3.client('s3',
+                             aws_access_key_id=keys_json['aws_access_key_id'],
+                             aws_secret_access_key=keys_json['aws_secret_access_key'],
+                             region_name='us-west-2'
+                             )
+    
+    #iterate through files in S3
+    # for key in s3_client.list_objects(Bucket='test-speechcapture')['Contents']:
+       #  if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
+          #   print(key['Key']) #log(print) the file name
+          #   s3AudioList.append(key['Key']) #append the name of the audio file to the list
+    for key in s3_client.list_objects(Bucket=bucket)['Contents']:
+        if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
+            print(key['Key']) #log(print) the file name
+            s3AudioList.append(key['Key']) #append the name of the audio file to the list
+    
+    #render the record page and pass into the page the list of files we found in S3
+    context = {'s3AudioList':s3AudioList}
+    # return render(request, 'webapp/transcript.html', {'data': content})
+    return render(request, 'webapp/transcript.html', context)
 
 @csrf_exempt
 def upload(request):
@@ -189,7 +223,40 @@ def transcript_backend(request, fileName):
     return HttpResponse(content=hold)
 
 def transcript(request, fileName):
-    return render(request, 'webapp/transcript.html', {'fileName': fileName})
+    s3AudioList = [] #will be the list of files that are stored in S3, will be in the dropdown on the record page
+
+    #open the file that contains the AWS access keys
+    key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
+    
+    #read the contents of the AWS keys file then close it
+    keys = key_file.read()
+    key_file.close()
+    
+    #load the keys to to json so each key can be accessed easier
+    keys_json = json.loads(keys)
+    
+    #connect to AWS S3 using boto3 and the AWS keys loaded from the file
+    s3_client = boto3.client('s3',
+                             aws_access_key_id=keys_json['aws_access_key_id'],
+                             aws_secret_access_key=keys_json['aws_secret_access_key'],
+                             region_name='us-west-2'
+                             )
+    
+    #iterate through files in S3
+    # for key in s3_client.list_objects(Bucket='test-speechcapture')['Contents']:
+       #  if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
+          #   print(key['Key']) #log(print) the file name
+          #   s3AudioList.append(key['Key']) #append the name of the audio file to the list
+    for key in s3_client.list_objects(Bucket=bucket)['Contents']:
+        if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
+            print(key['Key']) #log(print) the file name
+            s3AudioList.append(key['Key']) #append the name of the audio file to the list
+    
+    #render the record page and pass into the page the list of files we found in S3
+    context = {'s3AudioList':s3AudioList}
+    context['fileName'] = fileName
+    # return render(request, 'webapp/transcript.html', {'fileName': fileName})
+    return render(request, 'webapp/transcript.html', context)
 
 @csrf_exempt
 def record(request):
@@ -228,7 +295,6 @@ def analysis_default(request):
 
 @csrf_exempt
 def analysis(request, fileName):
-    print("why god do you hate me")
     key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
 
     keys = key_file.read()
@@ -262,45 +328,3 @@ def analysis(request, fileName):
     text = result["Body"].read().decode()
     result = json.loads(text)
     return render(request, 'webapp/analysis.html', {'data': result})
-
-def history(request):
-    request.user = get_user(request)
-    if request.user.username:
-        recs = Recordings.objects.filter(user=request.user.username)
-        trans = Recordings.objects.filter(user=request.user.username)
-        comps = Recordings.objects.filter(user=request.user.username)
-    return render(request, 'webapp/history.html')
-
-class UserFormView(View):
-    form_class = UserForm
-    template_name = 'webapp/register.html'
-
-    # Display form
-    def get(self, request):
-        form = self.form_class(None)
-        return render(request, self.template_name, {'form': form})
-
-    # Process form
-    @csrf_exempt
-    def post(self, request):
-        form = self.form_class(request.POST)
-
-        if form.is_valid():
-            user = form.save(commit=False)
-            # Cleaned Data
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user.username = username
-            user.set_password(password)
-            user.save()
-
-            # Return objects if credentials are correct
-            user = authenticate(username=username, password=password)
-
-            # Login the user
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    return redirect('/')
-        # Login failed
-        return render(request, self.template_name, {'form': form})

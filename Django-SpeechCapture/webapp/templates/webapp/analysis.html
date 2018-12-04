@@ -1,7 +1,15 @@
 {% extends "webapp/header.html" %}
 
 {% block transcript %}
-	<div class="d-flex justify-content-center">
+
+{% load static %}
+
+    <div class="ajaxProgress">
+        <h3>Please Wait...</h3>
+        <img src= "{% static 'webapp/img/ajax-loader.gif' %}"/>
+    </div>
+    <div id="content">
+    <div class="d-flex justify-content-center">
 		<div class="btn-group btn-group-toggle" data-toggle="buttons">
 			<label class="btn btn-primary active" id="summary">
 				<input type="radio" checked> Summary
@@ -89,5 +97,15 @@
             <a class="btn btn-info" id="saveButtonUseCase">Download</a>
         </div>
     </div>
+    </div>
+
+    <script>
+        window.onbeforeunload = function () {
+            	return "Are you sure";
+        };
+        
+        // $('#content').hide();
+        // $('.ajaxProgress').show();
+    </script>
 
 {% endblock %}

@@ -7,7 +7,21 @@
 	<div class = "container topElement">
 		<div class="row">
 			<div class="col text-center">
-				<button type="button" class="btn btn-secondary">Upload Audio File</button>
+					<select id="s3-file-select" onchange="transcribeDropdownEvent(this.value);">
+							<option value="">--Please choose an option--</option>
+							{% if s3AudioList %}
+								{% autoescape off %}
+								{% for audio in s3AudioList %}
+									{% if fileName and fileName == audio%}
+										<option selected ="selected" value={{audio}}>{{audio}}</option>
+									{% else %}
+										<option value={{audio}}>{{audio}}</option>
+									{% endif %}
+								{% endfor %}
+		
+								{% endautoescape %}
+							{% endif %}
+						</select>
 			</div>
 			<div class="col text-center">
 				<a href="#" id="saveButton" class="btn btn-secondary" download="transcript.txt">Save Text</a>
@@ -34,6 +48,47 @@
 	</div>
 
 	<script type="text/javascript">
+		function transcribeDropdownEvent(value)
+		{
+				$(document).ready(function() {
+					$('.ajaxProgress').show();
+					var fileName = value;
+					// var dropdown = document.getElementById("s3-file-select");
+					// for (var i = 0; i < dropdown.options.length; i++) {
+					//     if (dropdown.options[i].text === fileName) {
+					//         dropdown.selectedIndex = i;
+					//         break;
+					// }
+					$.ajax({
+						type: "GET",
+						url: "http://localhost:8000/transcript_backend/" + fileName,
+						dataType: "html",
+						async: true,
+						success: function(html) {
+							$("#scriptText").html(html);
+							$('.ajaxProgress').hide();
+							$("#scriptText").css("white-space", "nowrap")
+							$("#scriptText").css("white-space", "pre-line")
+						}
+					})
+				 });
+				
+				var fileName = value;
+				var analysisFile = fileName.replace(".wav", ".txt");
+				var transcriptFile = fileName.replace(".wav", ".txt");
+				document.getElementById("analysisBtn").href="http://localhost:8000/analysis/" + analysisFile;
+				document.getElementById("saveButton").href="https://s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
+		}
+	</script>
+
+	<script type="text/javascript">
+		var modified = true;
+		window.onbeforeunload = s => modified ? "" : null;
+	
+		$(window).on('beforeunload', function(){
+      		return 'Are you sure you want to leave?';
+		});
+
 		$(document).ready(function() {
 			$('.ajaxProgress').show();
 			var fileName = "{{fileName}}";
@@ -44,6 +99,8 @@
 				async: true,
 				crossDomain:true,
 				success: function(html) {
+					modified = false;
+
 					$("#scriptText").html(html);
 					$('.ajaxProgress').hide();
 
@@ -51,8 +108,8 @@
 					$("#scriptText").css("white-space", "pre-line")
 				}
 			})
- 		});
-		
+		 });
+
 		var fileName = "{{fileName}}";
 		var analysisFile = fileName.replace(".wav", ".txt");
 		var transcriptFile = fileName.replace(".wav", ".txt");
