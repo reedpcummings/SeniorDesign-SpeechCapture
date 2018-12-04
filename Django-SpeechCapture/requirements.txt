@@ -44,4 +44,4 @@ tqdm==4.28.1
 ujson==1.35
 urllib3==1.23
 wrapt==1.10.11
-
+mysqlclient==5.6.40
