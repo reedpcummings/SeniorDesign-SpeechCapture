@@ -50,74 +50,135 @@
 	<script type="text/javascript">
 		function transcribeDropdownEvent(value)
 		{
-				$(document).ready(function() {
-					$('.ajaxProgress').show();
-					var fileName = value;
-					// var dropdown = document.getElementById("s3-file-select");
-					// for (var i = 0; i < dropdown.options.length; i++) {
-					//     if (dropdown.options[i].text === fileName) {
-					//         dropdown.selectedIndex = i;
-					//         break;
-					// }
-					$.ajax({
-						type: "GET",
-						url: "http://localhost:8000/transcript_backend/" + fileName,
-						dataType: "html",
-						async: true,
-						success: function(html) {
-							$("#scriptText").html(html);
-							$('.ajaxProgress').hide();
-							$("#scriptText").css("white-space", "nowrap")
-							$("#scriptText").css("white-space", "pre-line")
-						}
-					})
-				 });
+			$(document).ready(function() {
+			$('.ajaxProgress').show();
+			var fileName = value;
+			
+			var url_get = "https://www.nttdata-capture-transcript-analysis.net/startThreadTask/" + fileName
+			console.log(url_get)
+			$.ajax({
+                    type: "GET",
+                    url: url_get,
+                    dataType: "json",
+                    success: function(data) {
+						console.log("got to success.")
+						console.log(data.check)
+                        var threadInterval = setInterval(function(){
+                            checkTask("/checkThreadTask/" + data.id, function(check){
+                                if(check.is_done){
+                                    console.log('Task ' + data.id + ' succeeded.')
+									console.log('check: ' + check.result)
+									$("#scriptText").html(check.result);
+									$('.ajaxProgress').hide();
+									$("#scriptText").css("white-space", "nowrap")
+		 							$("#scriptText").css("white-space", "pre-line")
+									clearInterval(threadInterval);
+								}
+                            })
+                        },1000)
+					},
+					error: function() {$('.ajaxProgress').hide();}
+					
+                })
+
+		 function checkTask(url, cb){
+				console.log("check: " + "https://www.nttdata-capture-transcript-analysis.net/checkThreadTask/" + fileName)
+				$.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    success: function(data) {
+                        cb(data)
+                    }
+				})}
+			}
+		)
+				// $(document).ready(function() {
+				// 	$('.ajaxProgress').show();
+				// 	var fileName = value;
+
+				// 	$.ajax({
+				// 		type: "GET",
+				// 		url: "http://www.nttdata-capture-transcript-analysis.net/startThreadTask/" + fileName,
+				// 		dataType: "html",
+				// 		async: true,
+				// 		success: function(html) {
+				// 			$("#scriptText").html(html);
+				// 			$('.ajaxProgress').hide();
+				// 			$("#scriptText").css("white-space", "nowrap")
+				// 			$("#scriptText").css("white-space", "pre-line")
+				// 		}
+				// 	})
+				//  });
 				
 				var fileName = value;
 				var analysisFile = fileName.replace(".wav", ".txt");
 				var transcriptFile = fileName.replace(".wav", ".txt");
-				document.getElementById("analysisBtn").href="http://localhost:8000/analysis/" + analysisFile;
-				document.getElementById("saveButton").href="https://s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
+				document.getElementById("analysisBtn").href="http://www.nttdata-capture-transcript-analysis.net/analysis/" + analysisFile;
+				document.getElementById("saveButton").href="http://www.s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
 		}
 	</script>
 
 	<script type="text/javascript">
+
 		var modified = true;
 		window.onbeforeunload = s => modified ? "" : null;
 	
 		$(window).on('beforeunload', function(){
       		return 'Are you sure you want to leave?';
 		});
+		
+		var fileName = "{{fileName}}";
 
 		$(document).ready(function() {
 			$('.ajaxProgress').show();
 			var fileName = "{{fileName}}";
+			var url_get = "https://www.nttdata-capture-transcript-analysis.net/startThreadTask/" + fileName
+			console.log(url_get)
 			$.ajax({
-				type: "GET",
-				url: "http://localhost:8000/transcript_backend/" + fileName,
-				dataType: "html",
-				async: true,
-				crossDomain:true,
-				success: function(html) {
-					modified = false;
+                    type: "GET",
+                    url: url_get,
+                    dataType: "json",
+                    success: function(data) {
+						console.log("got to success.")
+						console.log(data.check)
+                        var threadInterval = setInterval(function(){
+                            checkTask("/checkThreadTask/" + data.id, function(check){
+                                if(check.is_done){
+                                    console.log('Task ' + data.id + ' succeeded.')
+									console.log('check: ' + check.result)
+									$("#scriptText").html(check.result);
+									$('.ajaxProgress').hide();
+									$("#scriptText").css("white-space", "nowrap")
+		 							$("#scriptText").css("white-space", "pre-line")
+									clearInterval(threadInterval);
+								}
+                            })
+                        },1000)
+					},
+					error: function() {$('.ajaxProgress').hide();}
+					
+                })
 
-					$("#scriptText").html(html);
-					$('.ajaxProgress').hide();
-
-					$("#scriptText").css("white-space", "nowrap")
-					$("#scriptText").css("white-space", "pre-line")
-				}
-			})
-		 });
-
-		var fileName = "{{fileName}}";
+		 function checkTask(url, cb){
+				console.log("check: " + "https://www.nttdata-capture-transcript-analysis.net/checkThreadTask/" + fileName)
+				$.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    success: function(data) {
+                        cb(data)
+                    }
+				})}
+			}
+		)
+		
 		var analysisFile = fileName.replace(".wav", ".txt");
 		var transcriptFile = fileName.replace(".wav", ".txt");
 
-		document.getElementById("analysisBtn").href="http://localhost:8000/analysis/" + analysisFile;
-		document.getElementById("saveButton").href="https://s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
+		document.getElementById("analysisBtn").href="https://www.nttdata-capture-transcript-analysis.net/analysis/" + analysisFile;
+		document.getElementById("saveButton").href="https://www.s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
 		 
-	
 	</script>
 
 {% endblock %}
