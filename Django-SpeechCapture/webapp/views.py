@@ -1,16 +1,18 @@
+import threading
 import os, time, json, boto3
 import string
 import datetime
 import re
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, get_user
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Recordings, Transcriptions, Analysis
+from .models import Recordings, Transcriptions, Analysis, ThreadTask
 from .forms import UserForm
 from .libs import Analysis
 
@@ -51,7 +53,7 @@ def transcript_default(request):
           #   s3AudioList.append(key['Key']) #append the name of the audio file to the list
     for key in s3_client.list_objects(Bucket=bucket)['Contents']:
         if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
-            print(key['Key']) #log(print) the file name
+            #print(key['Key']) #log(print) the file name
             s3AudioList.append(key['Key']) #append the name of the audio file to the list
     
     #render the record page and pass into the page the list of files we found in S3
@@ -60,6 +62,7 @@ def transcript_default(request):
     return render(request, 'webapp/transcript.html', context)
 
 @csrf_exempt
+@never_cache
 def upload(request):
     audio_file = request.FILES['audio_test'].read() #get the audio file from the POST passed in (request)
 
@@ -97,12 +100,66 @@ def upload(request):
     #return the file name so that we can display that name on the webpage
     return HttpResponse(fileName)
 
+@never_cache
+def startThreadTask(request, fileName):
+    task = ThreadTask()
+    task.save()
+    t = threading.Thread(target=transcript_backend,args=[fileName, task.id])
+    t.setDaemon(True)
+    t.start()
+    check = "Original task: " + str(task.id)
+    return JsonResponse({'id':task.id, 'check':check})
+
+@never_cache
+def checkThreadTask(request,id):
+    #open the file that contains the AWS access keys
+    key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
+    
+    #read the contents of the AWS keys file then close it
+    keys = key_file.read()
+    key_file.close()
+    
+    #load the keys to to json so each key can be accessed easier
+    keys_json = json.loads(keys)
+    
+    #connect to AWS S3 using boto3 and the AWS keys loaded from the file
+    s3_client = boto3.client('s3',
+                             aws_access_key_id=keys_json['aws_access_key_id'],
+                             aws_secret_access_key=keys_json['aws_secret_access_key'],
+                             region_name='us-west-2'
+                             )
+    task = ThreadTask.objects.get(pk=id)
+
+    if(task.is_done):
+        print("Finished Properly")
+        result = {}
+        result['is_done'] = task.is_done
+        result['result'] = task.task
+        return JsonResponse(result)
+        #return JsonResponse({'is_done':task.is_done, 'result':task.task})
+    else:
+        print("Still Working")
+        return JsonResponse({'is_done':task.is_done})
+
+    # try:
+    #     s3_client.get_object(Bucket='test-speechcapture', Key=newFileName)
+        
+        
+    #         print("Finished Parsing")
+    #         print("Task: " + task.task)
+    #         return JsonResponse({'is_done':task.is_done, 'result':task.task})
+    # except:
+    #         return JsonResponse({'is_done':task.is_done})
+
 ######################################################################################################################
 # The backend of the transcription page.                                                                             #
 # Handles the transcription of the file in S3 whose name is passed in(fileName) and returns the transcription result.#
 ######################################################################################################################
 @csrf_exempt
-def transcript_backend(request, fileName):
+@never_cache
+def transcript_backend(fileName, id):
+    task = ThreadTask.objects.get(pk=id)
+
     #open the file that contains the AWS access keys
     key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
     
@@ -141,7 +198,7 @@ def transcript_backend(request, fileName):
     #file is not found so the transcription is not readily available thus we need to create the transcription job
     except:
         print("Transcription not already performed. Starting new transcription.") #log that a new transcription is being done
-        job_uri = "https://s3-us-west-2-amazonaws.com/test-speechcapture/" + fileName #URL to the audio file we wish to transcribe (will be passed to AWS Transcribe)
+        job_uri = "http://s3-us-west-2-amazonaws.com/test-speechcapture/" + fileName #URL to the audio file we wish to transcribe (will be passed to AWS Transcribe)
         
         #start the new transcription job
         transcribe_client.start_transcription_job(
@@ -220,8 +277,11 @@ def transcript_backend(request, fileName):
 
     hold = """<p>""" + hold + "</p>" #add html tags to our transcription so that when we return it we can print it in the browser
 
-    return HttpResponse(content=hold)
+    task.task = hold
+    task.is_done = True
+    task.save()
 
+@never_cache
 def transcript(request, fileName):
     s3AudioList = [] #will be the list of files that are stored in S3, will be in the dropdown on the record page
 
@@ -249,7 +309,7 @@ def transcript(request, fileName):
           #   s3AudioList.append(key['Key']) #append the name of the audio file to the list
     for key in s3_client.list_objects(Bucket=bucket)['Contents']:
         if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
-            print(key['Key']) #log(print) the file name
+            #print(key['Key']) #log(print) the file name
             s3AudioList.append(key['Key']) #append the name of the audio file to the list
     
     #render the record page and pass into the page the list of files we found in S3

@@ -19,3 +19,7 @@ class Analysis(models.Model):
     url = models.CharField(max_length=1000)
     name = models.CharField(max_length=1000)
     uploadDate = models.DateTimeField(max_length=100)
+
+class ThreadTask(models.Model):
+    task = models.CharField(max_length=100000, blank=True, null=True)
+    is_done = models.BooleanField(blank=False,default=False )

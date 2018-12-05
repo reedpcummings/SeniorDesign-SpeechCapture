@@ -41,7 +41,7 @@ function transcribeFile() {
         return alert("Please select a valid file from the dropdown.");
     var fName = {'fileName' : select.options[select.selectedIndex].text}
     //alert("Transcribing " + select.options[select.selectedIndex].text)
-	location.href = "http://localhost:8000/transcript/" + select.options[select.selectedIndex].text;
+	location.href = "https://www.nttdata-capture-transcript-analysis.net/transcript/" + select.options[select.selectedIndex].text;
 	//document.getElementById("transcribeLink").href="http://localhost:8000/transcript/" + select.options[select.selectedIndex].text;
 
 	// $.ajax({
@@ -73,19 +73,11 @@ function uploadExistingFile() {
     form.append('audio_test', file);
 	on();
     $.ajax({
-		url: 'http://localhost:8000/upload/',
-        //url: 'http:local/upload/',
+        url: 'https://www.nttdata-capture-transcript-analysis.net/upload/',
         type: 'POST',
         data: form,
         processData: false,
-		contentType: false,
-		crossDomain:true,
-		headers: {
-			'Access-Control-Allow-Origin': '*'
-		},
-		xhrFields: {
-			withCredentials: false
-		  },
+        contentType: false,
         success: function (data) {
 			off();
 			console.log('response' + (data));
@@ -292,13 +284,11 @@ function createDownloadLink(blob) {
 		form.append('audio_test', blob);
 	
 		$.ajax({
-			//url: 'http://django-env.krxijs76pr.us-west-2.elasticbeanstalk.com/upload/',
-			url: 'http://localhost:8000/upload/',
+			url: 'https://www.nttdata-capture-transcript-analysis.net/upload/',
 			type: 'POST',
 			data: form,
 			processData: false,
 			contentType: false,
-			crossDomain:true,
 			success: function (data) {
 				off();
 				console.log('response ' + (data));
