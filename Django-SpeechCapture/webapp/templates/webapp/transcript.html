@@ -53,8 +53,7 @@
 			$(document).ready(function() {
 			$('.ajaxProgress').show();
 			var fileName = value;
-			
-			var url_get = "https://www.nttdata-capture-transcript-analysis.net/startThreadTask/" + fileName
+			var url_get = "{% url 'startThreadTask' 123 %}".replace('123', fileName);
 			console.log(url_get)
 			$.ajax({
                     type: "GET",
@@ -64,9 +63,10 @@
 						console.log("got to success.")
 						console.log(data.check)
                         var threadInterval = setInterval(function(){
-                            checkTask("/checkThreadTask/" + data.id, function(check){
+							var url_check = "{% url 'checkThreadTask' 123 %}".replace('123', data.id);
+                            checkTask(url_check, function(check){
                                 if(check.is_done){
-                                    console.log('Task ' + data.id + ' succeeded.')
+									console.log('Task ' + data.id + ' succeeded.')
 									console.log('check: ' + check.result)
 									$("#scriptText").html(check.result);
 									$('.ajaxProgress').hide();
@@ -82,7 +82,7 @@
                 })
 
 		 function checkTask(url, cb){
-				console.log("check: " + "https://www.nttdata-capture-transcript-analysis.net/checkThreadTask/" + fileName)
+				console.log("check: " + url)
 				$.ajax({
                     type: "GET",
                     url: url,
@@ -92,29 +92,11 @@
                     }
 				})}
 			}
-		)
-				// $(document).ready(function() {
-				// 	$('.ajaxProgress').show();
-				// 	var fileName = value;
-
-				// 	$.ajax({
-				// 		type: "GET",
-				// 		url: "http://www.nttdata-capture-transcript-analysis.net/startThreadTask/" + fileName,
-				// 		dataType: "html",
-				// 		async: true,
-				// 		success: function(html) {
-				// 			$("#scriptText").html(html);
-				// 			$('.ajaxProgress').hide();
-				// 			$("#scriptText").css("white-space", "nowrap")
-				// 			$("#scriptText").css("white-space", "pre-line")
-				// 		}
-				// 	})
-				//  });
-				
+		)		
 				var fileName = value;
 				var analysisFile = fileName.replace(".wav", ".txt");
 				var transcriptFile = fileName.replace(".wav", ".txt");
-				document.getElementById("analysisBtn").href="http://www.nttdata-capture-transcript-analysis.net/analysis/" + analysisFile;
+				document.getElementById("analysisBtn").href="{% url 'analysis' 123 %}".replace('123', analysisFile);//"http://www.nttdata-capture-transcript-analysis.net/analysis/" + analysisFile;
 				document.getElementById("saveButton").href="http://www.s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
 		}
 	</script>
@@ -133,8 +115,8 @@
 		$(document).ready(function() {
 			$('.ajaxProgress').show();
 			var fileName = "{{fileName}}";
-			var url_get = "https://www.nttdata-capture-transcript-analysis.net/startThreadTask/" + fileName
-			console.log(url_get)
+			var url_get = "{% url 'startThreadTask' 123 %}".replace('123', fileName);
+			
 			$.ajax({
                     type: "GET",
                     url: url_get,
@@ -143,7 +125,8 @@
 						console.log("got to success.")
 						console.log(data.check)
                         var threadInterval = setInterval(function(){
-                            checkTask("/checkThreadTask/" + data.id, function(check){
+							var url_check = "{% url 'checkThreadTask' 123 %}".replace('123', data.id);
+                            checkTask(url_check, function(check){
                                 if(check.is_done){
                                     console.log('Task ' + data.id + ' succeeded.')
 									console.log('check: ' + check.result)
@@ -161,7 +144,7 @@
                 })
 
 		 function checkTask(url, cb){
-				console.log("check: " + "https://www.nttdata-capture-transcript-analysis.net/checkThreadTask/" + fileName)
+				console.log("check: " + url)
 				$.ajax({
                     type: "GET",
                     url: url,
@@ -176,7 +159,7 @@
 		var analysisFile = fileName.replace(".wav", ".txt");
 		var transcriptFile = fileName.replace(".wav", ".txt");
 
-		document.getElementById("analysisBtn").href="https://www.nttdata-capture-transcript-analysis.net/analysis/" + analysisFile;
+		document.getElementById("analysisBtn").href="{% url 'analysis' 123 %}".replace('123', analysisFile);//"https://www.nttdata-capture-transcript-analysis.net/analysis/" + analysisFile;
 		document.getElementById("saveButton").href="https://www.s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
 		 
 	</script>

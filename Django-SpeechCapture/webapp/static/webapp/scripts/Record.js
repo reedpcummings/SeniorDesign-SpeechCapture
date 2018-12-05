@@ -281,6 +281,7 @@ function createDownloadLink(blob) {
 		var form = new FormData();
 		on();
 		// form.append('audio_test', blob, filename + ".wav");
+		blob.name = "Testing";
 		form.append('audio_test', blob);
 	
 		$.ajax({
