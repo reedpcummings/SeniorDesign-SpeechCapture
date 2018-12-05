@@ -16,7 +16,7 @@ from .libs import Analysis
 
 from django.http import HttpResponse
 
-bucket = 'test-speechcapture'
+bucket_name = 'test-speechcapture'
 
 def index(request):
     directory_old = os.listdir(os.path.join(os.getcwd(), "webapp", "static"))
@@ -49,7 +49,7 @@ def transcript_default(request):
        #  if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
           #   print(key['Key']) #log(print) the file name
           #   s3AudioList.append(key['Key']) #append the name of the audio file to the list
-    for key in s3_client.list_objects(Bucket=bucket)['Contents']:
+    for key in s3_client.list_objects(Bucket=bucket_name)['Contents']:
         if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
             print(key['Key']) #log(print) the file name
             s3AudioList.append(key['Key']) #append the name of the audio file to the list
@@ -89,7 +89,14 @@ def upload(request):
         region_name='us-west-2')
 
     #upload the audio file we created to S3 
-    s3_client.upload_file(Filename=os.path.join(os.getcwd(), fileName), Bucket='test-speechcapture', Key=fileName)
+    s3_client.upload_file(Filename=os.path.join(os.getcwd(), fileName), Bucket=bucket_name, Key=fileName)
+
+    #update databse
+    recording_model = Recordings()
+    recording_model.name = fileName
+    recording_model.uploadDate = datetime.datetime.now()
+    recording_model.url = "https://" + bucket_name + ".s3.amazonaws.com/" + fileName
+    recording_model.save()
 
     #remove the file from the local file system
     os.remove(fileName)
@@ -214,7 +221,16 @@ def transcript_backend(request, fileName):
         print(hold, file=text_file)
 
     #upload the text file to S3
-    s3_client.upload_file(Filename=os.path.join(os.getcwd(), textFileName), Bucket='test-speechcapture', Key=textFileName, ExtraArgs={'ACL':'public-read'})
+    s3_client.upload_file(Filename=os.path.join(os.getcwd(), textFileName), Bucket=bucket_name, Key=textFileName, ExtraArgs={'ACL':'public-read'})
+
+
+
+    # update database
+    transcript_model = Transcriptions()
+    transcript_model.name = fileName
+    transcript_model.uploadDate = datetime.datetime.now()
+    transcript_model.url = "https://" + bucket_name + ".s3.amazonaws.com/" + textFileName
+    transcript_model.save()
 
     os.remove(textFileName) #remove the file from the local machine now that it has been uploaded
 
@@ -247,7 +263,7 @@ def transcript(request, fileName):
        #  if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
           #   print(key['Key']) #log(print) the file name
           #   s3AudioList.append(key['Key']) #append the name of the audio file to the list
-    for key in s3_client.list_objects(Bucket=bucket)['Contents']:
+    for key in s3_client.list_objects(Bucket=bucket_name)['Contents']:
         if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
             print(key['Key']) #log(print) the file name
             s3AudioList.append(key['Key']) #append the name of the audio file to the list
@@ -281,17 +297,41 @@ def record(request):
     
     #iterate through files in S3
     for key in s3_client.list_objects(Bucket='test-speechcapture')['Contents']:
-	    if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
-		    print(key['Key']) #log(print) the file name
-		    s3AudioList.append(key['Key']) #append the name of the audio file to the list
+        if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
+            print(key['Key']) #log(print) the file name
+            s3AudioList.append(key['Key']) #append the name of the audio file to the list
     
     #render the record page and pass into the page the list of files we found in S3
     context = {'s3AudioList':s3AudioList}
     return render(request, 'webapp/record.html', context)
     
 def analysis_default(request):
-    result = {}
-    return render(request, 'webapp/analysis.html', {'data': result})
+    s3TextList = []  # list of all txt files in s3
+    # open the file that contains the AWS access keys
+    key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
+
+    # read the contents of the AWS keys file then close it
+    keys = key_file.read()
+    key_file.close()
+
+    # load the keys to to json so each key can be accessed easier
+    keys_json = json.loads(keys)
+
+    # connect to AWS S3 using boto3 and the AWS keys loaded from the file
+    s3_client = boto3.client('s3',
+                             aws_access_key_id=keys_json['aws_access_key_id'],
+                             aws_secret_access_key=keys_json['aws_secret_access_key'],
+                             region_name='us-west-2'
+                             )
+
+    for key in s3_client.list_objects(Bucket=bucket_name)['Contents']:
+        if key['Key'][-4:] == '.txt':  # if the file is txt
+            s3TextList.append(key['Key'])  # append the name of the audio file to the list
+
+    # render the record page and pass into the page the list of files we found in S3
+    context = {'s3AudioList': s3TextList}
+    # return render(request, 'webapp/transcript.html', {'data': content})
+    return render(request, 'webapp/transcript.html', context)
 
 @csrf_exempt
 def analysis(request, fileName):

@@ -8,6 +8,24 @@
         <h3>Please Wait...</h3>
         <img src= "{% static 'webapp/img/ajax-loader.gif' %}"/>
     </div>
+    <div class="col text-center">
+        <select id="s3-file-select" onchange="analysisDropdownEvent(this.value);">
+            <option value="">--Please choose an option--</option>
+                {% if s3TextList %}
+                    {% autoescape off %}
+                    {% for text in s3TextList %}
+                        {% if fileName and fileName == text%}
+                            <option selected ="selected" value={{text}}>{{text}}</option>
+                        {% else %}
+                            <option value={{text}}>{{text}}</option>
+                        {% endif %}
+                    {% endfor %}
+
+                {% endautoescape %}
+            {% endif %}
+        </select>
+    </div>
+
     <div id="content">
     <div class="d-flex justify-content-center">
 		<div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -98,6 +116,34 @@
         </div>
     </div>
     </div>
+
+    <script type="text/javascript">
+		function analysisDropdownEvent(value)
+		{
+				$(document).ready(function() {
+					$('.ajaxProgress').show();
+					var fileName = value;
+					// var dropdown = document.getElementById("s3-file-select");
+					// for (var i = 0; i < dropdown.options.length; i++) {
+					//     if (dropdown.options[i].text === fileName) {
+					//         dropdown.selectedIndex = i;
+					//         break;
+					// }
+					$.ajax({
+						type: "GET",
+						url: "http://localhost:8000/transcript_backend/" + fileName,
+						dataType: "html",
+						async: true,
+						success: function(html) {
+							$("#scriptText").html(html);
+							$('.ajaxProgress').hide();
+							$("#scriptText").css("white-space", "nowrap")
+							$("#scriptText").css("white-space", "pre-line")
+						}
+					})
+				 });
+		}
+	</script>
 
     <script>
         window.onbeforeunload = function () {
