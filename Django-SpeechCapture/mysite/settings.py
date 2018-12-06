@@ -116,17 +116,6 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 #     }
 # }
 
-# if 'RDS_HOSTNAME' in os.environ:
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
-#             'HOST': os.environ['RDS_HOSTNAME'],
-#             'PORT': os.environ['RDS_PORT'],
-# else:
 DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
