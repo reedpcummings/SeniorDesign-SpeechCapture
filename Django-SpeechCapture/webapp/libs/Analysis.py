@@ -336,20 +336,26 @@ def GenerateSummary(content, num_sents, num_keywords):
         words = word_tokenize(sent)
         weighted_val = 0
         for word in words:
-            if  word in sent_tokens_cleaned:
+            if word in sent_tokens_cleaned:
                 weighted_val += weighted_frequency_dict[word]
         weighted_sentence_dict[sent] = weighted_val
     sorted_sents = sorted(weighted_sentence_dict, key=(lambda key: weighted_sentence_dict[key]), reverse=True)
     summary_list = []
     index = 0
     while index < num_sents:
-        summary_list.append(sorted_sents[index])
-        index += 1
+        if index in num_sents:
+            summary_list.append(sorted_sents[index])
+            index += 1
+        else:
+            break
 
     keyword_list = []
     index = 0
     while index < num_keywords:
-        keyword_list.append(sorted_values[index][0])
-        index += 1
+        if index in sorted_values[index]:
+            keyword_list.append(sorted_values[index][0])
+            index += 1
+        else:
+            break
 
     return ' '.join(summary_list), ' '.join(keyword_list)
