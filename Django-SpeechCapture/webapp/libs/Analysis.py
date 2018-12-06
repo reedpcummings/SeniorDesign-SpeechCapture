@@ -54,30 +54,30 @@ def GenerateUseCase(content):
 
     for key, value in questionDict.items():
         for sent in value:
-            wpFound = False
-            postFound = False
-            normalFlowFound = False
-            alternativeFlowFound = False
+            if "normal" in sent and "flow" in sent:
+                normalFlowIndex = key
+                continue
+            if "alt" in sent and "flow" in sent:
+                alternativeFlowIndex = key
+                continue
+            if "post" in sent and "condition" in sent:
+                precondtionIndex = key
+                continue
+            if "pre" in sent and "condition" in sent:
+                postconditionIndex = key
+                continue
+
             tokens = word_tokenize(sent)
             tokens = [word.lower() for word in tokens]
             tagged = pos_tag(tokens)
             for items in tagged:
-                if items[1] == 'WP':
-                    wpFound = True
-                    continue
                 if snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("actors"):
-                    normalFlowFound = True
-                    continue
-                if snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("actors"):
-                    alternativeFlowFound = True
-                    continue
-                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("actors"):
                     actorIndex = key
-                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("name"):
+                if snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("name"):
                     nameIndex = key
-                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("triggers"):
+                if snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("triggers"):
                     triggerIndex = key
-                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("id"):
+                if snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("id"):
                     if idIndex == -1:
                         idIndex = key
                     else:
@@ -91,22 +91,6 @@ def GenerateUseCase(content):
                                         "AlternativeFlow": altFlow}
                         total_dict[dict_num] = usecase_dict
                         dict_num += 1
-                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("precondition"):
-                    precondtionIndex = key
-                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("post"):
-                    postFound = True
-                    continue
-                if wpFound and postFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("condition"):
-                    postconditionIndex = key
-                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("flow"):
-                    if normalFlowFound:
-                        normalFlowIndex = key
-                    elif alternativeFlowFound:
-                        alternativeFlowIndex = key
-                if wpFound and snowball_stemmer.stem(items[0]) == snowball_stemmer.stem("precondition"):
-                    precondtionIndex = key
-                alternativeFlowFound = False
-                normalFlowFound = False
 
         if nameIndex != -1:
             name = ' '.join(answerDict[nameIndex])
@@ -126,8 +110,8 @@ def GenerateUseCase(content):
             preconditions = ' '.join(answerDict[precondtionIndex])
         if alternativeFlowIndex != -1:
             altFlow = ' '.join(answerDict[alternativeFlowIndex])
-        # if triggerIndex != -1:
-        #     triggerIndex = ' '.join(answerDict[triggerIndex])
+        if triggerIndex != -1:
+            trigger = ' '.join(answerDict[triggerIndex])
     usecase_dict = {"Name": name,
                     "ID": id,
                     "Trigger": trigger,
@@ -151,7 +135,6 @@ def GetAllAttributesV2(content, fileName):
         joinedString = ' '.join(joinedList)
         summary, keywords = GenerateSummary(' '.join(joinedList), 1, 10)
         entities = ExtractEntities(joinedString, 5)
-        print(entities)
         sentiment = ExtractSentiments(joinedList)
         qaDict = {"Index": index,
                   "Question": ' '.join(questionDict[key]),
@@ -211,7 +194,7 @@ def ExtractAllQuestions(content):
     questionFound = False
     answerFound = False
     for vals in sentToken:
-        if re.match(r'(^|(?<=[.?!]))\s*[A-Za-z,;:\'\"\s]+\?', vals):
+        if re.match(r'(^|(?<=[.?!]))\s*[A-Za-z0-9_,;:\'\"\s]+\?', vals):
             index += 1
             questionDict[index] = [""]
             answerDict[index] = [""]
@@ -227,7 +210,7 @@ def DelineateSentences(content):
     content = sent_tokenize(content)
     sentList = []
     for sent in content:
-        if re.match(r'(^|(?<=[.?!]))\s*[A-Za-z,;:\'\"\s]+\?', sent):
+        if re.match(r'(^|(?<=[.?!]))\s*[A-Za-z0-9_,;:\'\"\s]+\?', sent):
             sentList.append(sent)
             sentList.append('\n')
         else:
@@ -237,7 +220,7 @@ def DelineateSentences(content):
 
 def RemoveQuestions(content):
     for vals in content:
-        if re.match(r'(^|(?<=[.?!]))\s*[A-Za-z,;:\'\"\s]+\?', vals):
+        if re.match(r'(^|(?<=[.?!]))\s*[A-Za-z0-9_,;:\'\"\s]+\?', vals):
             content.remove(vals)
     return content
 # Get questions relevant to the entity provided in the argument. Must provide the dictionaries

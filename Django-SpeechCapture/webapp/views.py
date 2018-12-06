@@ -201,7 +201,7 @@ def transcript_backend(fileName, id):
     #file is not found so the transcription is not readily available thus we need to create the transcription job
     except:
         print("Transcription not already performed. Starting new transcription.") #log that a new transcription is being done
-        job_uri = "http://s3-us-west-2-amazonaws.com/test-speechcapture/" + fileName #URL to the audio file we wish to transcribe (will be passed to AWS Transcribe)
+        job_uri = "http://s3-us-west-2-amazonaws.com/" + bucket_name + "/" + fileName #URL to the audio file we wish to transcribe (will be passed to AWS Transcribe)
         
         #start the new transcription job
         transcribe_client.start_transcription_job(
@@ -405,22 +405,20 @@ def analysis(request, fileName):
     job_name = fileName.replace(".txt","") #re.sub('\.txt$', '', fileName)
     # If the file already exists in the bucket
     key_name = (job_name + 'Analysis' + '.json')
-    # try:
-    #     result = s3_client.get_object(Bucket='test-speechcapture', Key=(key_name))
-    #     return render(request, 'webapp/analysis.html', {'data': result})
-    # #except:
-    #try:    
-    result = s3_client.get_object(Bucket=bucket_name, Key=(fileName))
-    text = result["Body"].read().decode()
-    Analysis.GetAllAttributesV2(text, fileName)
-    # wait for the file to be uploaded to the bucket
-    while True:
-        try: 
-            result = s3_client.get_object(Bucket=bucket_name, Key=(key_name))
-            break
-        except:
-            print("Not ready yet...")
-            time.sleep(5)
+    try:
+        result = s3_client.get_object(Bucket=bucket_name, Key=(key_name))
+    except:
+        result = s3_client.get_object(Bucket=bucket_name, Key=(fileName))
+        text = result["Body"].read().decode()
+        Analysis.GetAllAttributesV2(text, fileName)
+        # wait for the file to be uploaded to the bucket
+        while True:
+            try:
+                result = s3_client.get_object(Bucket=bucket_name, Key=(key_name))
+                break
+            except:
+                print("Not ready yet...")
+                time.sleep(5)
     text = result["Body"].read().decode()
     result = json.loads(text)
     return render(request, 'webapp/analysis.html', {'data': result})
