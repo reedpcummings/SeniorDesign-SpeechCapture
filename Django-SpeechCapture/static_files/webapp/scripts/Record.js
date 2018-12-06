@@ -41,9 +41,10 @@ function transcribeFile() {
         return alert("Please select a valid file from the dropdown.");
     var fName = {'fileName' : select.options[select.selectedIndex].text}
     //alert("Transcribing " + select.options[select.selectedIndex].text)
-	location.href = "https://www.nttdata-capture-transcript-analysis.net/transcript/" + select.options[select.selectedIndex].text;
+	location.href = "/transcript/" + select.options[select.selectedIndex].text;//"https://www.nttdata-capture-transcript-analysis.net/transcript/" + select.options[select.selectedIndex].text;
 	//document.getElementById("transcribeLink").href="http://localhost:8000/transcript/" + select.options[select.selectedIndex].text;
 
+	//MY CHANGE
 	// $.ajax({
     //     url: 'http://localhost:8000/homepage/transcribe/',
     //     type: 'POST',
@@ -73,7 +74,7 @@ function uploadExistingFile() {
     form.append('audio_test', file);
 	on();
     $.ajax({
-        url: 'https://www.nttdata-capture-transcript-analysis.net/upload/',
+        url: "/upload/",//'https://www.nttdata-capture-transcript-analysis.net/upload/',
         type: 'POST',
         data: form,
         processData: false,
@@ -227,8 +228,8 @@ function createDownloadLink(blob) {
 	var link = document.createElement('a');
 
 	//name of .wav file to use during upload and download (without extendion)
-	var filename = new Date().toISOString();
-
+	var filename = prompt("Enter filename: ");
+	filename = filename.replace(/\s/g, '_');
 	//add controls to the <audio> element
 	au.controls = true;
 	au.src = url;
@@ -256,19 +257,6 @@ function createDownloadLink(blob) {
 	var upload = document.createElement('a');
 	upload.href="#";
 	upload.innerHTML = "Upload";
-	// upload.addEventListener("click", function(event){
-	// 	  var xhr=new XMLHttpRequest();
-	// 	  xhr.onload=function(e) {
-	// 	      if(this.readyState === 4) {
-	// 	          console.log("Server returned: ",e.target.responseText);
-	// 	      }
-	// 	  };
-	// 	  var fd=new FormData();
-	// 	  fd.append("audio_data",blob, filename);
-	// 	  xhr.open("POST","upload.php",true);
-	// 	  xhr.send(fd);
-	// })
-	
 
 	upload.addEventListener("click", function(event){
 		
@@ -281,11 +269,12 @@ function createDownloadLink(blob) {
 		var form = new FormData();
 		on();
 		// form.append('audio_test', blob, filename + ".wav");
-		blob.name = "Testing";
-		form.append('audio_test', blob);
+		var postFileName = filename
+		postFileName = postFileName.replace(/\s/g, '_');
+		form.append('audio_test', blob, postFileName);
 	
 		$.ajax({
-			url: 'https://www.nttdata-capture-transcript-analysis.net/upload/',
+			url: "/upload/",//'https://www.nttdata-capture-transcript-analysis.net/upload/',
 			type: 'POST',
 			data: form,
 			processData: false,

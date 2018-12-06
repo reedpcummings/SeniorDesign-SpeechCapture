@@ -21,8 +21,6 @@ from django.http import HttpResponse
 bucket = 'test-speechcapture'
 
 def index(request):
-    directory_old = os.listdir(os.path.join(os.getcwd(), "webapp", "static"))
-    directory_new = os.listdir(os.path.join(os.getcwd(), "webapp", "static", "webapp"))
     return render(request, 'webapp/home.html')
 
 def transcript_default(request):

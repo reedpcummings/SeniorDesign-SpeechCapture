@@ -97,7 +97,7 @@
 				var analysisFile = fileName.replace(".wav", ".txt");
 				var transcriptFile = fileName.replace(".wav", ".txt");
 				document.getElementById("analysisBtn").href="{% url 'analysis' 123 %}".replace('123', analysisFile);//"http://www.nttdata-capture-transcript-analysis.net/analysis/" + analysisFile;
-				document.getElementById("saveButton").href="http://www.s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
+				document.getElementById("saveButton").href="https://s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
 		}
 	</script>
 
@@ -160,7 +160,7 @@
 		var transcriptFile = fileName.replace(".wav", ".txt");
 
 		document.getElementById("analysisBtn").href="{% url 'analysis' 123 %}".replace('123', analysisFile);//"https://www.nttdata-capture-transcript-analysis.net/analysis/" + analysisFile;
-		document.getElementById("saveButton").href="https://www.s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
+		document.getElementById("saveButton").href="https://s3-us-west-2.amazonaws.com/test-speechcapture/" + transcriptFile; 
 		 
 	</script>
 
