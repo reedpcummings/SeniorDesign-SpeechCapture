@@ -21,8 +21,6 @@ from django.http import HttpResponse
 bucket_name = 'test-speechcapture'
 
 def index(request):
-    directory_old = os.listdir(os.path.join(os.getcwd(), "webapp", "static"))
-    directory_new = os.listdir(os.path.join(os.getcwd(), "webapp", "static", "webapp"))
     return render(request, 'webapp/home.html')
 
 def transcript_default(request):
@@ -65,10 +63,9 @@ def transcript_default(request):
 @never_cache
 def upload(request):
     audio_file = request.FILES['audio_test'].read() #get the audio file from the POST passed in (request)
-
     now = datetime.datetime.now() #get current date/time
-    now = now.strftime('%Y-%m-%dT%H-%M') + ('-%02d' % (now.microsecond / 10000)) #put into format we want
-    fileName = "test_audio_" + now + ".wav" #create the file name that includes the date/time as well as the file extension(in this case .wav)
+    now = now.strftime('%Y-%m-%d-T%H-%M') + ('-%02d' % (now.microsecond / 10000)) #put into format we want
+    fileName = request.FILES['audio_test'].name + "_" + now + ".wav" #create the file name that includes the date/time as well as the file extension(in this case .wav)
 
     #open the file to be written with name fileName, write the audio to that file, close the file
     file = open(fileName, 'wb')
@@ -145,7 +142,6 @@ def checkThreadTask(request,id):
         return JsonResponse(result)
         #return JsonResponse({'is_done':task.is_done, 'result':task.task})
     else:
-        print("Still Working")
         return JsonResponse({'is_done':task.is_done})
 
     # try:
@@ -358,7 +354,7 @@ def record(request):
     #iterate through files in S3
     for key in s3_client.list_objects(Bucket='test-speechcapture')['Contents']:
         if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
-            print(key['Key']) #log(print) the file name
+		    #print(key['Key']) #log(print) the file name
             s3AudioList.append(key['Key']) #append the name of the audio file to the list
     
     #render the record page and pass into the page the list of files we found in S3
