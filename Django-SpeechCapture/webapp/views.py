@@ -197,7 +197,7 @@ def transcript_backend(fileName, id):
     #try to get the file in S3 named newFileName which is the normal fileName with .json at the end instead of .wav
     #if it doesn't find the file it will throw an exception and we will go to the except and run that
     try:
-        s3_client.get_object(Bucket='test-speechcapture', Key=newFileName)
+        s3_client.get_object(Bucket=bucket_name, Key=newFileName)
     #file is not found so the transcription is not readily available thus we need to create the transcription job
     except:
         print("Transcription not already performed. Starting new transcription.") #log that a new transcription is being done
@@ -209,7 +209,7 @@ def transcript_backend(fileName, id):
             Media={'MediaFileUri': job_uri}, #the URL of the audio file is passed in
             MediaFormat='wav', #the file type of the audio file
             LanguageCode='en-US', #language of the audio file
-            OutputBucketName='test-speechcapture', #the S3 bucket to output the transcription file to(the file will be the same name as the job_name appended with .json)
+            OutputBucketName=bucket_name, #the S3 bucket to output the transcription file to(the file will be the same name as the job_name appended with .json)
             Settings={'ShowSpeakerLabels': True, 'MaxSpeakerLabels': 2} #allow speaker identification with a max number of speakers being 2
         )
 
@@ -228,7 +228,7 @@ def transcript_backend(fileName, id):
             time.sleep(5) #time to wait between status checks of the transcription job, in our case it is 5 seconds
 
     #get the transcript of the audio file from the S3 bucket (will be a json file)
-    result = s3_client.get_object(Bucket='test-speechcapture', Key= newFileName)
+    result = s3_client.get_object(Bucket=bucket_name, Key= newFileName)
     
     #read the Body of the json and decode it so we can access the contents
     text = result["Body"].read().decode()
@@ -352,7 +352,7 @@ def record(request):
                              )
     
     #iterate through files in S3
-    for key in s3_client.list_objects(Bucket='test-speechcapture')['Contents']:
+    for key in s3_client.list_objects(Bucket=bucket_name)['Contents']:
         if key['Key'][-4:] == '.mp3' or key['Key'][-4:] == '.wav': #if the file is a wav or mp3
 		    #print(key['Key']) #log(print) the file name
             s3AudioList.append(key['Key']) #append the name of the audio file to the list
@@ -410,13 +410,13 @@ def analysis(request, fileName):
     #     return render(request, 'webapp/analysis.html', {'data': result})
     # #except:
     #try:    
-    result = s3_client.get_object(Bucket='test-speechcapture', Key=(fileName))
+    result = s3_client.get_object(Bucket=bucket_name, Key=(fileName))
     text = result["Body"].read().decode()
     Analysis.GetAllAttributesV2(text, fileName)
     # wait for the file to be uploaded to the bucket
     while True:
         try: 
-            result = s3_client.get_object(Bucket='test-speechcapture', Key=(key_name))
+            result = s3_client.get_object(Bucket=bucket_name, Key=(key_name))
             break
         except:
             print("Not ready yet...")

@@ -21,5 +21,5 @@ class Analysis(models.Model):
 
 
 class ThreadTask(models.Model):
-    task = models.CharField(max_length=100000, blank=True, null=True)
+    task = models.CharField(max_length=1000000, blank=True, null=True)
     is_done = models.BooleanField(blank=False, default=False)
