@@ -144,21 +144,21 @@ def GetAllAttributesV2(content, fileName):
     questionDict, answerDict = ExtractAllQuestions(content)
     useCaseDict = GenerateUseCase(content)
     overallSummary, overallKeywords = GenerateSummary(content, 5, 5)
-    print(content)
     totalQuestionDict = {}
     index = 0
     for key, value in questionDict.items():
         joinedList = questionDict[key] + answerDict[key]
         joinedString = ' '.join(joinedList)
-        summary, keywords = GenerateSummary(joinedList, 1, 10)
+        summary, keywords = GenerateSummary(' '.join(joinedList), 1, 10)
         entities = ExtractEntities(joinedString, 5)
+        print(entities)
         sentiment = ExtractSentiments(joinedList)
         qaDict = {"Index": index,
                   "Question": ' '.join(questionDict[key]),
                   "Answer": ' '.join(answerDict[key]),
                   "Summary": None,
                   "Entities": entities,
-                  "Keywords": keywords,
+                  "Keywords": keywords.replace(' ', ', '),
                   "Sentiment": sentiment}
         totalQuestionDict[key] = qaDict
         index += 1
@@ -273,8 +273,6 @@ def ExtractEntities(content, numEntities):
             for item in value:
                 if item == "RequestId" or item == "HTTPStatusCode" or item == "HTTPHeaders" or item == "RetryAttempts":
                     continue
-                if item["Type"] == "QUANTITY" or item["Type"] == "DATE":
-                    continue
                 if item["Text"] in entities:
                     entities[item["Text"]] += 1
                 else:
@@ -290,10 +288,6 @@ def ExtractEntities(content, numEntities):
 
 # Create a comprehend object and run the Detect Entities function
 def __DetectEntities(content):
-    # Create the comprehend object
-
-    #comprehend = boto3.client(service_name='comprehend', region_name='us-west-2')
-
     # Split the string
     if content.__len__() > 4500:
         content = __SplitString(content, 4500)
@@ -302,7 +296,7 @@ def __DetectEntities(content):
 
     json = []
     for s in content:
-        json.append(comprehend.detect_entities(Text=s, LanguageCode='en'))
+        json.append(comprehend.detect_key_phrases(Text=s, LanguageCode='en'))
     return json
 
 # Splits up input strings due to comprehend's limit on input to 5000 characters
@@ -343,7 +337,7 @@ def GenerateSummary(content, num_sents, num_keywords):
     summary_list = []
     index = 0
     while index < num_sents:
-        if index in num_sents:
+        if index < len(sorted_sents):
             summary_list.append(sorted_sents[index])
             index += 1
         else:
@@ -352,7 +346,7 @@ def GenerateSummary(content, num_sents, num_keywords):
     keyword_list = []
     index = 0
     while index < num_keywords:
-        if index in sorted_values[index]:
+        if index < len(sorted_values):
             keyword_list.append(sorted_values[index][0])
             index += 1
         else:
