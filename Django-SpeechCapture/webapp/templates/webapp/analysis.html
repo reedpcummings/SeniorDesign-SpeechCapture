@@ -131,7 +131,7 @@
 					// }
 					$.ajax({
 						type: "GET",
-						url: "http://localhost:8000/transcript_backend/" + fileName,
+						url: "/analysis_backend/" + fileName,
 						dataType: "html",
 						async: true,
 						success: function(html) {
