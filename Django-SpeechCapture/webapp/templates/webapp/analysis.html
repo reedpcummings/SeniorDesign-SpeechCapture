@@ -96,7 +96,7 @@
                     <br/>
                     <b>ID:</b> {{value2.ID}}
                     <br/>
-                    <b>Description:</b> {{value2.Trigger}}
+                    <b>Triggers:</b> {{value2.Trigger}}
                     <br/>
                     <b>Preconditions:</b> {{value2.Preconditions}}
                     <br/>
@@ -123,15 +123,9 @@
 				$(document).ready(function() {
 					$('.ajaxProgress').show();
 					var fileName = value;
-					// var dropdown = document.getElementById("s3-file-select");
-					// for (var i = 0; i < dropdown.options.length; i++) {
-					//     if (dropdown.options[i].text === fileName) {
-					//         dropdown.selectedIndex = i;
-					//         break;
-					// }
 					$.ajax({
 						type: "GET",
-						url: "/analysis_backend/" + fileName,
+						url: "/analysis/" + fileName,
 						dataType: "html",
 						async: true,
 						success: function(html) {
