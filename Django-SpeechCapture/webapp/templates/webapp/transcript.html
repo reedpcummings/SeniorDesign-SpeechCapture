@@ -47,6 +47,19 @@
 		</div>
 	</div>
 
+	<script>
+		var modified = true;
+		window.onbeforeunload = s => modified ? "" : null;
+		$(window).on('beforeunload', function(){
+			if(!modified){
+				$(window).unbind("beforeunload");
+				return null;
+			}
+			else  
+				return 'Are you sure you want to leave?';
+		});
+	</script>
+
 	<script type="text/javascript">
 		function transcribeDropdownEvent(value)
 		{
@@ -66,6 +79,8 @@
 							var url_check = "{% url 'checkThreadTask' 123 %}".replace('123', data.id);
                             checkTask(url_check, function(check){
                                 if(check.is_done){
+									modified = false;
+									
 									console.log('Task ' + data.id + ' succeeded.')
 									console.log('check: ' + check.result)
 									$("#scriptText").html(check.result);
@@ -79,7 +94,8 @@
 					},
 					error: function() {$('.ajaxProgress').hide();}
 					
-                })
+				})
+				console.log(modified)
 
 		 function checkTask(url, cb){
 				console.log("check: " + url)
@@ -102,14 +118,6 @@
 	</script>
 
 	<script type="text/javascript">
-
-		var modified = true;
-		window.onbeforeunload = s => modified ? "" : null;
-	
-		$(window).on('beforeunload', function(){
-      		return 'Are you sure you want to leave?';
-		});
-		
 		var fileName = "{{fileName}}";
 
 		$(document).ready(function() {
@@ -128,6 +136,7 @@
 							var url_check = "{% url 'checkThreadTask' 123 %}".replace('123', data.id);
                             checkTask(url_check, function(check){
                                 if(check.is_done){
+									modified = false;
                                     console.log('Task ' + data.id + ' succeeded.')
 									console.log('check: ' + check.result)
 									$("#scriptText").html(check.result);
