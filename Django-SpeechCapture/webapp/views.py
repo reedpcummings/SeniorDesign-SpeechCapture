@@ -385,12 +385,13 @@ def analysis_default(request):
             s3TextList.append(key['Key'])  # append the name of the audio file to the list
 
     # render the record page and pass into the page the list of files we found in S3
-    context = {'s3AudioList': s3TextList}
+    context = {'s3TextList': s3TextList}
     # return render(request, 'webapp/transcript.html', {'data': content})
-    return render(request, 'webapp/transcript.html', context)
+    return render(request, 'webapp/analysis.html', context)
 
 @csrf_exempt
 def analysis(request, fileName):
+    s3TextList = []  # list of all txt files in s3
     key_file = open(os.path.join(os.path.curdir, 'webapp', 'keys.txt'), 'r')
 
     keys = key_file.read()
@@ -402,6 +403,11 @@ def analysis(request, fileName):
                              aws_secret_access_key=keys_json['aws_secret_access_key'],
                              region_name='us-west-2'
                              )
+
+    for key in s3_client.list_objects(Bucket=bucket_name)['Contents']:
+        if key['Key'][-4:] == '.txt':  # if the file is txt
+            s3TextList.append(key['Key'])  # append the name of the audio file to the list
+
     job_name = fileName.replace(".txt","") #re.sub('\.txt$', '', fileName)
     # If the file already exists in the bucket
     key_name = (job_name + 'Analysis' + '.json')
@@ -421,4 +427,4 @@ def analysis(request, fileName):
                 time.sleep(5)
     text = result["Body"].read().decode()
     result = json.loads(text)
-    return render(request, 'webapp/analysis.html', {'data': result})
+    return render(request, 'webapp/analysis.html', {'data': result, 's3TextList': s3TextList})

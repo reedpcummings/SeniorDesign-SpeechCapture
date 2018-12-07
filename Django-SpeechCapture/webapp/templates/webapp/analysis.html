@@ -4,15 +4,11 @@
 
 {% load static %}
 
-    <div class="ajaxProgress">
-        <h3>Please Wait...</h3>
-        <img src= "{% static 'webapp/img/ajax-loader.gif' %}"/>
-    </div>
     <div class="col text-center">
         <select id="s3-file-select" onchange="analysisDropdownEvent(this.value);">
             <option value="">--Please choose an option--</option>
-                {% if s3TextList %}
-                    {% autoescape off %}
+            {% if s3TextList %}
+                {% autoescape off %}
                     {% for text in s3TextList %}
                         {% if fileName and fileName == text%}
                             <option selected ="selected" value={{text}}>{{text}}</option>
@@ -20,7 +16,6 @@
                             <option value={{text}}>{{text}}</option>
                         {% endif %}
                     {% endfor %}
-
                 {% endautoescape %}
             {% endif %}
         </select>
@@ -120,32 +115,10 @@
     <script type="text/javascript">
 		function analysisDropdownEvent(value)
 		{
-				$(document).ready(function() {
-					$('.ajaxProgress').show();
-					var fileName = value;
-					$.ajax({
-						type: "GET",
-						url: "/analysis/" + fileName,
-						dataType: "html",
-						async: true,
-						success: function(html) {
-							$("#scriptText").html(html);
-							$('.ajaxProgress').hide();
-							$("#scriptText").css("white-space", "nowrap")
-							$("#scriptText").css("white-space", "pre-line")
-						}
-					})
-				 });
+            $(document).ready(function() {
+                window.location.href = window.location.origin + "/analysis/" + value;
+             });
 		}
 	</script>
-
-    <script>
-        window.onbeforeunload = function () {
-            	return "Are you sure";
-        };
-        
-        // $('#content').hide();
-        // $('.ajaxProgress').show();
-    </script>
 
 {% endblock %}
