@@ -161,6 +161,7 @@ def GetAllAttributesV2(content, fileName):
 
     s3_client.upload_file(Filename=os.path.join(os.getcwd(), fileName), Bucket=bucket_name,
                           Key=fileName, ExtraArgs={'ACL': 'public-read'})
+    os.remove(os.path.join(os.getcwd(), fileName))
 
 
 # Given an entity, perform ExtractSentences and then find the average sentiment of
