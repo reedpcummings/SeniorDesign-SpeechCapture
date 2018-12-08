@@ -65,7 +65,8 @@ def upload(request):
     audio_file = request.FILES['audio_test'].read() #get the audio file from the POST passed in (request)
     now = datetime.datetime.now() #get current date/time
     now = now.strftime('%Y-%m-%d-T%H-%M') + ('-%02d' % (now.microsecond / 10000)) #put into format we want
-    fileName = request.FILES['audio_test'].name + "_" + now + ".wav" #create the file name that includes the date/time as well as the file extension(in this case .wav)
+    audioFileName = request.FILES['audio_test'].name.replace('.wav', '')
+    fileName = audioFileName + "_" + now + ".wav" #create the file name that includes the date/time as well as the file extension(in this case .wav)
 
     #open the file to be written with name fileName, write the audio to that file, close the file
     file = open(fileName, 'wb')
