@@ -4,7 +4,7 @@
 
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Python Project</title>
+	<title>NTT Data Project</title>
 	<meta charset="utf-8" />
 	{% load staticfiles %}
 
@@ -32,19 +32,14 @@
               </a>
             </li>
             <li class="nav-item">
-				{% if user.is_authenticated %}
-			  		<a class="nav-link" href="{% url 'logout' %}">Logout</a>
-				{% else %}
-					<a class="nav-link" href="{% url 'login' %}">Login</a>
-				{% endif %}
             </li>
           </ul>
         </div>
       </div>
 		</nav>
 
-	{% block login %}
-	{% endblock %}
+	<!-- {% block login %}
+	{% endblock %} -->
 	{% block home %}
 	{% endblock %}
 	{% block transcript %}
@@ -53,21 +48,20 @@
 	{% endblock %}
 	{% block record %}
 	{% endblock %}
-	{% block history %}
-	{% endblock %}
 
     <!-- Footer -->
 	<div class="fixed-bottom">
 		<footer class="py-2 bg-dark">
 		  <div class="container">
-			<p class="m-0 text-center text-white">Copyright &copy; Your Website 2018</p>
+			<p class="m-0 text-center text-white"></p>
 		  </div>
 		  <!-- /.container -->
 		</footer>
 	</div>
 
+	<script type="text/javascript" src="{% static 'webapp/scripts/Record.js' %}"></script>
+	<script type="text/javascript" src="{% static 'webapp/scripts/radioSelection.js' %}"></script>
 	<script type="text/javascript" src="{% static 'webapp/scripts/downloadFile.js' %}"></script>
-	<script type="text/javascript" src="{% static 'webapp/scripts/recorderButtons.js' %}"></script>
 	<script type="text/javascript" src="{% static 'webapp/scripts/recorderServerUpload.js' %}"></script>
 </body>
 

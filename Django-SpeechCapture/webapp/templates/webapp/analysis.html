@@ -1,57 +1,124 @@
 {% extends "webapp/header.html" %}
 
 {% block transcript %}
-    <div class="container scroll">
-		<div class="card">
-			<div class="card-body">
-				<div style="border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">
-                    {% for key,value in data.items %}
-                        <div class="card">
-							<div class="card-body">
-								<h5 class="card-title">{{key}}</h5>
-								<div class="container-fluid">
-									<a class="btn btn-primary" data-toggle="collapse" data-target="#summary{{value.Index}}" role="button" aria-expanded="false">Summary</a>
-									<div class="collapse" id="summary{{value.Index}}">
-										<div class="card card-body">
-											{{value.Summary|linebreaks}}
-										</div>
-									</div>
-								</div>
-								<div class="container-fluid">
-									<a class="btn btn-primary" data-toggle="collapse" data-target="#questions{{value.Index}}" role="button" aria-expanded="false">Q&A</a>
-									<div class="collapse" id="questions{{value.Index}}">
-										<div class="card card-body">
-											{{value.Questions|linebreaks}}
-										</div>
-									</div>
-								</div>
-								<div class="container-fluid">
-									<a class="btn btn-primary" data-toggle="collapse" data-target="#metadata{{value.Index}}" role="button" aria-expanded="false">Metadata</a>
-									<div class="collapse" id="metadata{{value.Index}}">
-										<div class="card card-body">
-											<b>Keywords:</b> {{value.Keywords}}
-											<br/>
-											<br/>
-											<b>Entities:</b> {{value.Entities}}
-											<br/>
-											<br/>
-											<b>Sentiment:</b>
-											Positive: {{value.Sentiment.positive}}
-											<br/>
-											Negative: {{value.Sentiment.negative}}
-											<br/>
-											Mixed: {{value.Sentiment.mixed}}
-											<br/>
-											Neutral: {{value.Sentiment.neutral}}
-										</div>
-									</div>
-								</div>
-							</div>
-                        </div>
+
+{% load static %}
+
+    <div class="col text-center">
+        <select id="s3-file-select" onchange="analysisDropdownEvent(this.value);">
+            <option value="">--Please choose an option--</option>
+            {% if s3TextList %}
+                {% autoescape off %}
+                    {% for text in s3TextList %}
+                        {% if fileName and fileName == text%}
+                            <option selected ="selected" value={{text}}>{{text}}</option>
+                        {% else %}
+                            <option value={{text}}>{{text}}</option>
+                        {% endif %}
                     {% endfor %}
-				</div>
-			</div>
+                {% endautoescape %}
+            {% endif %}
+        </select>
+    </div>
+
+    <div id="content">
+    <div class="d-flex justify-content-center">
+		<div class="btn-group btn-group-toggle" data-toggle="buttons">
+			<label class="btn btn-primary active" id="summary">
+				<input type="radio" checked> Summary
+			</label>
+			<label class="btn btn-primary" id="questions">
+				<input type="radio"> Questions & Answers
+			</label>
+			<label class="btn btn-primary" id="useCases">
+				<input type="radio"> Use Cases
+			</label>
 		</div>
 	</div>
+
+    <div class="card" id="summaryCont">
+        <div class="container scroll">
+            <div class="card-body">
+                {{data.OverallSummary}}
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <a class="btn btn-info" id="saveButtonSummary">Download</a>
+        </div>
+    </div>
+    <div class="card" id="questionCont">
+        <div class="container scroll">
+            <div class="card-body">
+                {% for key,value in data.Questions.items %}
+                    <b>Question:</b> {{value.Question}}
+                    <br/>
+                    <b>Answer:</b> {{value.Answer}}
+                    <div class="container-fluid">
+                        <a class="btn btn-info" data-toggle="collapse" data-target="#questions{{value.Index}}">Metadata</a>
+                        <div class="collapse" id="questions{{value.Index}}">
+                            <div class="card card-body">
+                                <b>Keywords:</b> {{value.Keywords}}
+                                <br/>
+                                <b>Entities:</b>
+                                {% for key2 in value.Entities %}
+                                    {{key2}},
+                                {% endfor %}
+                                <b>Sentiment:</b>
+                                Positive: {{value.Sentiment.positive}}
+                                <br/>
+                                Negative: {{value.Sentiment.negative}}
+                                <br/>
+                                Mixed: {{value.Sentiment.mixed}}
+                                <br/>
+                                Neutral: {{value.Sentiment.neutral}}
+                            </div>
+                        </div>
+                    </div>
+                    <br/>
+                    <br/>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <a class="btn btn-info" id="saveButtonQuestions">Download</a>
+        </div>
+    </div>
+    <div class="card" id="useCaseCont">
+        <div class="container scroll">
+            <div class="card-body">
+                {% for key2,value2 in data.UseCases.items %}
+                    <b>Name:</b> {{value2.Name}}
+                    <br/>
+                    <b>ID:</b> {{value2.ID}}
+                    <br/>
+                    <b>Triggers:</b> {{value2.Trigger}}
+                    <br/>
+                    <b>Preconditions:</b> {{value2.Preconditions}}
+                    <br/>
+                    <b>Post-conditions:</b> {{value2.Postconditions}}
+                    <br/>
+                    <b>Actors:</b> {{value2.Actors}}
+                    <br/>
+                    <b>Normal Flow:</b> {{value2.NormalFlow}}
+                    <br/>
+                    <b>Alternative Flows:</b> {{value2.AlternativeFlow}}
+                    <br/>
+                {% endfor %}
+            </div>
+        </div>>
+        <div class="d-flex justify-content-center">
+            <a class="btn btn-info" id="saveButtonUseCase">Download</a>
+        </div>
+    </div>
+    </div>
+
+    <script type="text/javascript">
+		function analysisDropdownEvent(value)
+		{
+            $(document).ready(function() {
+                window.location.href = window.location.origin + "/analysis/" + value;
+             });
+		}
+	</script>
 
 {% endblock %}

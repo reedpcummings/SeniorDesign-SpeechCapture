@@ -15,3 +15,13 @@ Django Webapp/mysite/test_audio.wav
 Django-SpeechCapture/webapp/keys.txt
 Django-SpeechCapture/test_audio.wav
 *.wav
+TranscribePrototype.py
+TranscribePrototype_Alternative.py
+Django-SpeechCapture/requirements_full.txt
+Django-SpeechCapture/requirements_good.txt
+Django-SpeechCapture/requirements_backup.txt
+Django-SpeechCapture/BrokenStuff.txt
+Django-SpeechCapture/To-do.txt
+Django-SpeechCapture/test_audio_2018-11-30T14-46-90Analysis.json
+Django-SpeechCapture/test_audio_2018-11-28T15-39-59Analysis.json
+Django-SpeechCapture/ClassDemo1_2018-12-06-T22-34-53Analysis.json
